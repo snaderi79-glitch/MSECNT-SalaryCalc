@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b5ed7"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MSECNT">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b5ed7'/%3E%3Cpath d='M14 46V30h8v16zm14 0V18h8v28zm14 0V24h8v22z' fill='%23fff'/%3E%3C/svg%3E">
+<title>تحلیل درآمد و هزینه ۱۴۰۵</title>
+<style>
+:root{--bg:#eef2f7;--card:#fff;--tx:#1b2430;--mut:#6b7686;--pri:#0b5ed7;--pri2:#0a4bb0;--ok:#12a150;--bad:#e03131;--bd:#dbe2ea;--ro:#f1f4f8;--sh:0 2px 10px #1b24301a}
+body.dark{--bg:#0f141b;--card:#1a212b;--tx:#e8edf3;--mut:#93a0b1;--bd:#2c3744;--ro:#222b37;--sh:0 2px 10px #0008}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Vazirmatn,"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(135deg,#0b5ed7,#12a150);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:10px}
+header h1{font-size:16px;margin:0;flex:1}header small{display:block;font-weight:400;opacity:.85;font-size:11px;margin-top:2px}
+.ib{background:#ffffff26;border:0;color:#fff;width:38px;height:38px;border-radius:12px;font-size:18px;cursor:pointer}
+main{max-width:980px;margin:auto;padding:12px}
+.tab{display:none}.tab.on{display:block;animation:f .25s}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.card h2{font-size:15px;margin:0 0 12px;color:var(--pri)}body.dark .card h2{color:#6ea8ff}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:4px}
+input,select{width:100%;font-size:16px;padding:11px;border:1.5px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);font-family:inherit;outline:0}
+input:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px #0b5ed733}
+input[readonly]{background:var(--ro);color:var(--mut)}
+.seg{display:flex;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden}
+.seg button{flex:1;border:0;background:transparent;color:var(--tx);padding:11px 4px;font-size:14px;font-family:inherit;cursor:pointer}
+.seg button.on{background:var(--pri);color:#fff;font-weight:700;box-shadow:inset 0 0 0 2px #fff6}.seg button.on::before{content:'✓ '}.seg button+button{border-right:1px solid var(--bd)}
+.step{display:flex;gap:6px}.step input{text-align:center}.step button{width:46px;border:0;border-radius:12px;background:var(--pri);color:#fff;font-size:22px;cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media(min-width:700px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{border-radius:16px;padding:14px;color:#fff;box-shadow:var(--sh)}
+.kpi span{font-size:12px;opacity:.9}.kpi b{display:block;font-size:17px;margin-top:6px;direction:ltr;text-align:right}
+.k1{background:linear-gradient(135deg,#0b5ed7,#4c8dff)}.k2{background:linear-gradient(135deg,#f08c00,#ffb347)}.k3{background:linear-gradient(135deg,#12a150,#4cc790)}.k3.neg{background:linear-gradient(135deg,#e03131,#ff7b7b)}.k4{background:linear-gradient(135deg,#6741d9,#9775fa)}
+.badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:700}
+.badge.ok{background:#12a15022;color:var(--ok)}.badge.bad{background:#e0313122;color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{border-bottom:1px solid var(--bd);padding:9px 6px;text-align:right}
+td.n{direction:ltr;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
+th{color:var(--mut);font-weight:600}.ceo th:first-child,.ceo td:first-child{position:sticky;right:0;background:var(--card)}
+.scroll{overflow-x:auto}.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-size:14px;font-family:inherit;cursor:pointer;background:var(--pri);color:#fff}
+.btn.s{background:var(--ro);color:var(--tx);border:1px solid var(--bd)}.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pie{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}.pie svg{width:190px;height:190px}
+.lg div{font-size:13px;margin:5px 0;display:flex;gap:8px;align-items:center}.lg i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.note{font-size:12px;color:var(--mut);line-height:1.8}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);display:flex;border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom);z-index:9}
+nav button{flex:1;border:0;background:transparent;color:var(--mut);padding:9px 0 8px;font-family:inherit;font-size:12px;cursor:pointer}
+nav button b{display:block;font-size:20px;font-weight:400}nav button.on{color:var(--pri);font-weight:700}
+@media print{header,nav,.btns{display:none}.tab{display:block!important}body{background:#fff;padding:0}}
+</style></head><body>
+<header><h1>تحلیل نسبت درآمد به هزینه ۱۴۰۵<small>مبالغ ماهانه به تومان</small></h1>
+<button class="ib" id="dm" title="تم">🌓</button><button class="ib" id="pr" title="چاپ / PDF">🖨</button></header>
+<main>
+<div class="tab on" id="t1">
+<div class="card"><h2>الف) دریافتی ماهانه از کارفرما (B)</h2><div class="g">
+<div><label>روش تعیین دریافتی</label><select id="method" hidden><option>بر اساس قرارداد</option><option>دستی</option></select><div class="seg" data-for="method"></div></div>
+<div><label>دریافتی دستی (تومان)</label><input class="money" id="manual" inputmode="decimal"></div>
+<div><label>شماره قرارداد</label><select id="contract"></select></div>
+<div><label>کارفرما</label><input id="employer" readonly></div>
+<div><label>موضوع قرارداد</label><input id="subject" readonly></div>
+<div><label>ضریب قرارداد</label><input id="coef" readonly></div>
+<div><label>رده شغلی</label><select id="role"></select></div>
+<div><label>سابقه کار (سال)</label><div class="step"><button data-st="exp" data-d="1">+</button><input id="exp" inputmode="decimal"><button data-st="exp" data-d="-1">−</button></div></div>
+<div><label>حق‌الزحمه مبنا (ماهانه)</label><input id="feebase" readonly></div>
+<div><label>دریافتی نهایی (B)</label><input id="B" readonly></div>
+<div><label>وضعیت</label><input id="status" readonly></div></div></div>
+<div class="card"><h2>ب) اطلاعات کارمند و هزینه‌ها</h2><div class="g">
+<div><label>حقوق پایه (ناخالص)</label><input class="money" id="base" inputmode="decimal"></div>
+<div><label>وضعیت بیمه‌پذیری</label><select id="ins" hidden><option value="1">1</option><option value="0">0</option></select><div class="seg" data-for="ins" data-l="بیمه‌پذیر|بازنشسته" data-v="1|0"></div></div>
+<div><label>تعداد روزهای ماه</label><select id="days" hidden><option>30</option><option>31</option></select><div class="seg" data-for="days"></div></div>
+<div><label>وضعیت تأهل</label><select id="married" hidden><option value="0">0</option><option value="1">1</option></select><div class="seg" data-for="married" data-l="مجرد|متأهل" data-v="0|1"></div></div>
+<div><label>تعداد فرزندان</label><div class="step"><button data-st="kids" data-d="1">+</button><input id="kids" inputmode="numeric"><button data-st="kids" data-d="-1">−</button></div></div>
+<div><label>بیمه تکمیلی هر نفر (ماهانه)</label><input class="money" id="supp" inputmode="decimal"></div>
+<div><label>پاداش مناسبتی (ماهانه)</label><input class="money" id="bonus" inputmode="decimal"></div>
+<div><label>لباس و تجهیزات ایمنی (ماهانه)</label><input class="money" id="cloth" inputmode="decimal"></div>
+<div><label>غذا (روزانه)</label><input class="money" id="food" inputmode="decimal"></div>
+<div><label>اسکان (روزانه)</label><input class="money" id="lodge" inputmode="decimal"></div>
+<div><label>ایاب و ذهاب (ماهانه)</label><input class="money" id="transp" inputmode="decimal"></div>
+<div><label>نرخ سربار از B (مثلاً 0.1)</label><input id="over" inputmode="decimal"></div>
+<div><label>نرخ سود خالص هدف (مثلاً 0.048)</label><input id="target" inputmode="decimal"></div>
+<div><label>نرخ ریسک تأخیر (ماهانه از B)</label><input id="risk" inputmode="decimal"></div>
+<div><label>مدت تأخیر وصول (ماه)</label><input id="delay" inputmode="decimal"></div></div>
+<div class="btns"><button class="btn" id="go">مشاهده نتایج ←</button><button class="btn s" id="setmax">حقوق پایه = حداکثر مجاز (سود هدف)</button><button class="btn s" id="reset">بازگشت به مقادیر اولیه</button></div></div>
+</div>
+<div class="tab" id="t2">
+<div class="kpis" id="kpis"></div>
+<div class="card"><h2>سهم اجزا از دریافتی (B)</h2><div class="pie"><svg viewBox="0 0 42 42" id="svg"></svg><div class="lg" id="lg"></div></div></div>
+<div class="card"><h2>نتایج محاسبات</h2><div class="scroll"><table id="res"></table></div></div>
+<div class="card"><h2>حداکثر حقوق حکمی (سر‌به‌سر و سود هدف)</h2><div class="scroll"><table id="mx"></table></div></div>
+</div>
+<div class="tab" id="t3"><div class="card"><h2>مقایسه سود هدف (۰ تا ۳۰٪)</h2><div class="scroll"><table id="ceo" class="ceo"></table></div>
+<p class="note">سود خالص پیشنهادی برای شرکت‌های گروه فولاد مبارکه ۱۰٪ و برای شرکت‌های خارج از گروه تا ۳۰٪ است. نرخ مالیات عملکرد ۲۵٪، سقف ماده ۳۸ برابر ۱۶٫۶۷٪ و مبالغ بن/مسکن/حق اولاد/تاهل مطابق فایل اکسل ثابت‌اند.</p></div></div>
+</main>
+<nav><button class="on" data-tab="t1"><b>📝</b>ورودی</button><button data-tab="t2"><b>📊</b>نتایج</button><button data-tab="t3"><b>⚖️</b>مقایسه</button></nav>
+<script>
+const CON=__CON__, FEE=__FEE__, DEF=__DEF__;
+const TAX=[[40e6,.1],[80e6,.05],[100e6,.05],[120e6,.05],[140e6,.05]];
+const $=i=>document.getElementById(i);
+const nf=v=>isFinite(v)?Math.round(v).toLocaleString('en-US'):String(v);
+const pf=v=>(v*100).toFixed(2)+'%';
+const num=i=>{const s=String($(i).value).replace(/[,٬\s]/g,'').replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c));const v=parseFloat(s);return isNaN(v)?0:v};
+const tax=a=>TAX.reduce((s,[f,g])=>s+(a>f?(a-f)*g:0),0);
+function fillStatic(){
+ $('contract').innerHTML=CON.map(c=>`<option>${c[0]}</option>`).join('');
+ $('role').innerHTML=Object.keys(FEE).map(k=>`<option>${k}</option>`).join('');
+}
+function setDefaults(){
+ const d=DEF;$('method').value=d.method;$('manual').value=d.manual;$('contract').value=d.contract;$('role').value=d.role;$('exp').value=d.exp;
+ for(const k of ['base','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'])$(k).value=d[k];
+}
+function params(){
+ const c=CON.find(c=>String(c[0])===$('contract').value)||['','-','-',0];
+ const exp=num('exp'),idx=Math.min(Math.floor(exp),25);
+ const feeK=(FEE[$('role').value]||[])[idx]||0;
+ const method=$('method').value;
+ const B=method==='دستی'?num('manual'):c[3]*feeK*100;
+ let st=method==='دستی'?'حالت دستی فعال است':feeK===0?'برای این رده و سابقه نرخی تعریف نشده است':c[3]===0?'ضریب این قرارداد هنوز وارد نشده':'محاسبه بر اساس قرارداد';
+ return {c,feeK,B,st,ins:+$('ins').value,days:+$('days').value,mar:+$('married').value,kids:num('kids'),supp:num('supp'),bonus:num('bonus'),cloth:num('cloth'),
+  food:num('food'),lodge:num('lodge'),transp:num('transp'),over:num('over'),target:num('target'),risk:num('risk'),delay:num('delay'),base:num('base')};
+}
+function consts(p){
+ const f=p.ins;
+ const wel=3e6*f+2.2e6*f+1662554*f*p.kids*f+5e5*p.mar*f;  // مسکن+بن+حق اولاد+تاهل
+ const kidsPay=1662554*f*p.kids*f;
+ const B26=16625550*p.days/30*f;
+ const hh=(1+p.kids+p.mar)*f;
+ const other=p.food*p.days+p.lodge*p.days+p.transp+hh*p.supp+p.bonus+p.cloth;
+ return {f,wel,kidsPay,cap:B26*7,B26,other,eid:3*B26/12*f,emp:.23*f,wk:.07*f,riskT:p.risk*p.delay};
+}
+function model(p,k,base){
+ const hk=base+k.wel, raw=hk-k.kidsPay, ib=Math.min(raw,k.cap), w=k.wk*ib, t=tax(hk-w);
+ const ins=k.emp*ib+w;
+ const C=ins+k.eid+base/12*k.f+hk/12*k.f+k.other+hk;
+ const over=p.over*p.B, risk=k.riskT*p.B, ceil=.1667*p.B;
+ const short=Math.max(0,ceil-.3*ib), pre=p.B-C-over-short-risk, taxc=Math.max(0,.25*pre);
+ return {hk,ib,w,t,ins,C,over,risk,short,pre,taxc,net:pre-taxc,empNet:hk-w-t,ceil};
+}
+function solveX(p,k,tg){
+ let lo=0,hi=p.B,D,M;
+ for(let i=0;i<50;i++){D=(lo+hi)/2;M=model(p,k,D).net-tg;if(i<49){if(M>=0)lo=D;else hi=D}}
+ const ans=M>=0?D:lo;
+ const ctl=model(p,k,0).net-tg;
+ return {base:ans,m:model(p,k,ans),ok:ctl>=0};
+}
+function row(a,b,cls){return `<tr><td>${a}</td><td class="n ${cls||''}">${b}</td></tr>`}
+const COL=['#0b5ed7','#f08c00','#e03131','#9c36b5','#868e96','#12a150'];
+function pie(p,m){
+ const it=[['هزینه مستقیم (C)',m.C],['سربار',m.over],['ریسک تأخیر',m.risk],['کسری ماده ۳۸',m.short],['مالیات عملکرد',m.taxc],['سود خالص',Math.max(0,m.net)]].map(x=>[x[0],Math.max(0,x[1])]);
+ const tot=it.reduce((s,x)=>s+x[1],0)||1;let off=25,h='<circle cx="21" cy="21" r="15.9" fill="none" stroke="#8884" stroke-width="6"/>';
+ it.forEach((x,i)=>{const d=x[1]/tot*100;if(d>0){h+=`<circle cx="21" cy="21" r="15.9" fill="none" stroke="${COL[i]}" stroke-width="6" stroke-dasharray="${d} ${100-d}" stroke-dashoffset="${off}"/>`;off-=d}});
+ $('svg').innerHTML=h;
+ $('lg').innerHTML=it.map((x,i)=>`<div><i style="background:${COL[i]}"></i>${x[0]}: <b>${(x[1]/tot*100).toFixed(1)}٪</b></div>`).join('');
+}
+function calc(){
+ const p=params(),k=consts(p);
+ $('employer').value=p.c[1];$('subject').value=p.c[2];$('coef').value=p.c[3];$('feebase').value=nf(p.feeK*100);$('B').value=nf(p.B);$('status').value=p.st;
+ $('manual').closest('div').style.opacity=$('method').value==='دستی'?1:.5;
+ const m=model(p,k,p.base),tg=p.target*p.B;
+ $('kpis').innerHTML=`<div class="kpi k1"><span>دریافتی ماهانه (B)</span><b>${nf(p.B)}</b></div><div class="kpi k2"><span>هزینه کل شرکت (C)</span><b>${nf(m.C)}</b></div><div class="kpi k3 ${m.net>0?'':'neg'}"><span>سود خالص</span><b>${nf(m.net)}</b></div><div class="kpi k4"><span>حاشیه سود / نسبت B÷C</span><b>${pf(p.B?m.net/p.B:0)} · ${(p.B/m.C).toFixed(2)}</b></div>`;
+ pie(p,m);
+ $('res').innerHTML=row('وضعیت',m.net>0?'<span class="badge ok">سودده ✔</span>':m.net===0?'سر به سر':'<span class="badge bad">زیان‌ده ✘</span>')+
+ row('دریافتی ماهانه (B)',nf(p.B))+row('حقوق حکمی (ناخالص)',nf(m.hk))+row('مبنای بیمه سقف‌خورده',nf(m.ib))+
+ row('بیمه سهم کارگر',nf(m.w))+row('مالیات ماهانه پلکانی',nf(m.t))+row('خالص پرداختی کارمند (A)',nf(m.empNet))+
+ row('مجموع بیمه ماهانه (۳۰٪)',nf(.3*m.ib))+row('هزینه کل شرکت برای کارمند (C)',nf(m.C))+
+ row('هزینه سربار',nf(m.over))+row('هزینه ریسک تأخیر',nf(m.risk))+row('کسری بیمه (ماده ۳۸)',nf(m.short))+
+ row('سود قبل از مالیات',nf(m.pre))+row('مالیات عملکرد شرکت',nf(m.taxc))+
+ row('سود خالص پس از مالیات',nf(m.net),m.net>0?'ok':'bad')+row('حاشیه سود خالص بر B',pf(p.B?m.net/p.B:0))+
+ row('سود هدف',nf(tg))+row('فاصله از سود هدف',nf(m.net-tg),m.net>=tg?'ok':'bad')+
+ row('نسبت B/C',(p.B/m.C).toFixed(3))+row('نسبت B/A',(p.B/m.empNet).toFixed(3))+row('نسبت C/A',(m.C/m.empNet).toFixed(3))+
+ row('سود ناخالص (B − C)',nf(p.B-m.C))+row('حاشیه سود ناخالص بر B',pf(p.B?(p.B-m.C)/p.B:0));
+ const s0=solveX(p,k,0),s1=solveX(p,k,tg);
+ const L=[['سود خالص هدف',s=>nf(s===s0?0:tg)],['حداکثر حقوق پایه',s=>nf(s.base)],['حداکثر حقوق حکمی',s=>nf(s.m.hk)],['مبنای بیمه',s=>nf(s.m.ib)],
+ ['بیمه سهم کارگر',s=>nf(s.m.w)],['مالیات حقوق',s=>nf(s.m.t)],['خالص کارمند (A)',s=>nf(s.m.empNet)],['هزینه کل شرکت (C)',s=>nf(s.m.C)],
+ ['کسری بیمه ماده ۳۸',s=>nf(s.m.short)],['سود قبل از مالیات',s=>nf(s.m.pre)],['سود خالص',s=>nf(s.m.net)],['نسبت B/C',s=>(p.B/s.m.C).toFixed(3)],
+ ['وضعیت',s=>s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
+ $('mx').innerHTML='<tr><th>شاخص</th><th>سر‌به‌سر</th><th>سود هدف</th></tr>'+L.map(l=>`<tr><td>${l[0]}</td><td class="n">${l[1](s0)}</td><td class="n">${l[1](s1)}</td></tr>`).join('');
+ const T=[0,.05,.1,.15,.2,.25,.3].map(r=>({r,s:solveX(p,k,r*p.B)}));
+ const cur=m.hk;
+ const CL=[['نرخ سود هدف',t=>pf(t.r)],['سود خالص هدف',t=>nf(t.r*p.B)],['حداکثر حقوق پایه',t=>nf(t.s.base)],['حداکثر حقوق حکمی',t=>nf(t.s.m.hk)],
+ ['بیمه سهم کارگر',t=>nf(t.s.m.w)],['مالیات حقوق',t=>nf(t.s.m.t)],['خالص کارمند (A)',t=>nf(t.s.m.empNet)],['هزینه کل شرکت (C)',t=>nf(t.s.m.C)],
+ ['سربار + ریسک',t=>nf(t.s.m.over+t.s.m.risk)],['کسری ماده ۳۸',t=>nf(t.s.m.short)],['سود قبل از مالیات',t=>nf(t.s.m.pre)],['مالیات عملکرد',t=>nf(t.s.m.taxc)],
+ ['سود خالص',t=>nf(t.s.m.net)],['نسبت B÷حکمی',t=>t.s.m.hk>0?(p.B/t.s.m.hk).toFixed(3):'-'],['نسبت B/C',t=>(p.B/t.s.m.C).toFixed(3)],
+ ['اختلاف با حکمی فعلی',t=>nf(t.s.m.hk-cur)],['وضعیت',t=>t.s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
+ $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n">${l[1](t)}</td>`).join('')}</tr>`).join('');
+ window._s1=s1;document.querySelectorAll('.seg').forEach(x=>x._s&&x._s());save();
+}
+const KEYS=['method','manual','contract','role','exp','base','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
+function save(){try{const o={};KEYS.forEach(k=>o[k]=$(k).value);localStorage.setItem('msecnt1',JSON.stringify(o))}catch(e){}}
+function load(){try{const o=JSON.parse(localStorage.getItem('msecnt1')||'null');if(o)KEYS.forEach(k=>{if(o[k]!=null)$(k).value=o[k]})}catch(e){}}
+function fmtMoney(e){const v=num(e.id);e.value=v?Math.round(v).toLocaleString('en-US'):(e.value===''?'':'0')}
+function segs(){document.querySelectorAll('.seg').forEach(sg=>{const sel=$(sg.dataset.for);const L=sg.dataset.l?sg.dataset.l.split('|'):[...sel.options].map(o=>o.text);const V=sg.dataset.v?sg.dataset.v.split('|'):[...sel.options].map(o=>o.value||o.text);
+ sg.innerHTML=V.map((v,i)=>`<button data-v="${v}">${L[i]}</button>`).join('');
+ sg.onclick=e=>{const b=e.target.closest('button');if(b){sel.value=b.dataset.v;calc()}};sg._s=()=>sg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===sel.value))})}
+function sync(){document.querySelectorAll('.seg').forEach(s=>s._s&&s._s());document.querySelectorAll('.money').forEach(fmtMoneyIfBlur)}
+function fmtMoneyIfBlur(e){if(document.activeElement!==e)fmtMoney(e)}
+function tab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===id));scrollTo(0,0)}
+document.querySelectorAll('input:not([readonly]),select').forEach(e=>{e.addEventListener('input',()=>{calc();sync()});e.addEventListener('change',()=>{calc();sync()})});
+document.querySelectorAll('.money').forEach(e=>{e.addEventListener('focus',()=>{const v=num(e.id);e.value=v||'';setTimeout(()=>e.select&&e.select(),0)});e.addEventListener('blur',()=>fmtMoney(e))});
+document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const e=$(b.dataset.st);e.value=Math.max(0,num(b.dataset.st)+ +b.dataset.d);calc();sync()});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+$('go').onclick=()=>tab('t2');
+$('setmax').onclick=()=>{$('base').value=Math.floor(window._s1.base);calc();sync()};
+$('reset').onclick=()=>{setDefaults();calc();sync()};
+$('pr').onclick=()=>print();
+$('dm').onclick=()=>{document.body.classList.toggle('dark');try{localStorage.setItem('msecnt_dark',document.body.classList.contains('dark')?1:0)}catch(e){}};
+try{if(localStorage.getItem('msecnt_dark')==1)document.body.classList.add('dark')}catch(e){}
+fillStatic();setDefaults();load();segs();calc();sync();
+</script></body></html>
