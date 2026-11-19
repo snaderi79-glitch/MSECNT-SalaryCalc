@@ -75,6 +75,8 @@ nav button b{display:block;font-size:20px;font-weight:400}nav button.on{color:va
 <div><label>وضعیت</label><input id="status" readonly></div></div></div>
 <div class="card"><h2>ب) اطلاعات کارمند و هزینه‌ها</h2><div class="g">
 <div><label>حقوق (خالص) مورد انتظار کارمند</label><input class="money" id="netexp" inputmode="decimal"></div>
+<div><label>حقوق حکمی (ناخالص) — فقط نمایش</label><input class="money" id="hkro" readonly></div>
+<div><label>حقوق پایه (ناخالص) — فقط نمایش</label><input class="money" id="basero" readonly></div>
 <div><label>وضعیت بیمه‌پذیری</label><select id="ins" hidden><option value="1">1</option><option value="0">0</option></select><div class="seg" data-for="ins" data-l="بیمه‌پذیر|بازنشسته" data-v="1|0"></div></div>
 <div><label>تعداد روزهای ماه</label><select id="days" hidden><option>30</option><option>31</option></select><div class="seg" data-for="days"></div></div>
 <div><label>وضعیت تأهل</label><select id="married" hidden><option value="0">0</option><option value="1">1</option></select><div class="seg" data-for="married" data-l="مجرد|متأهل" data-v="0|1"></div></div>
@@ -86,7 +88,7 @@ nav button b{display:block;font-size:20px;font-weight:400}nav button.on{color:va
 <div><label>اسکان (روزانه)</label><input class="money" id="lodge" inputmode="decimal"></div>
 <div><label>ایاب و ذهاب (ماهانه)</label><input class="money" id="transp" inputmode="decimal"></div>
 <div><label>نرخ سربار (درصد از B، مثلاً 10)</label><input id="over" inputmode="numeric"></div>
-<div><label>نرخ سود خالص هدف (درصد، مثلاً 5)</label><input id="target" inputmode="numeric"></div>
+<div><label>نرخ سود خالص هدف (درصد) — محاسبه خودکار</label><input id="target" readonly></div>
 <div><label>نرخ ریسک تأخیر ماهانه (درصد، مثلاً 2)</label><input id="risk" inputmode="numeric"></div>
 <div><label>مدت تأخیر وصول (ماه)</label><input id="delay" inputmode="decimal"></div></div>
 <div class="btns"><button class="btn" id="go">مشاهده نتایج ←</button></div></div>
@@ -96,7 +98,7 @@ nav button b{display:block;font-size:20px;font-weight:400}nav button.on{color:va
 <div class="card"><h2>سهم اجزا از دریافتی (B)</h2><div class="pie"><svg viewBox="0 0 42 42" id="svg"></svg><div class="lg" id="lg"></div></div></div>
 <div class="card"><h2>نتایج محاسبات</h2><div class="scroll"><table id="res"></table></div></div>
 </div>
-<div class="tab" id="t4"><div class="card"><h2>محاسبه حقوق (خالص) بر اساس سود هدف</h2><div class="scroll"><table id="tg"></table></div>
+<div class="tab" id="t4"><div class="card"><h2>محاسبه حقوق (خالص) بر اساس سود هدف</h2><div class="g"><div><label>نرخ سود خالص هدف (درصد، عدد صحیح)</label><input id="tgin" inputmode="numeric" value="5"></div></div><div class="scroll"><table id="tg"></table></div>
 <div class="btns"><button class="btn" id="setmax">اعمال به‌عنوان حقوق (خالص) مورد انتظار</button></div></div></div>
 <div class="tab" id="t3"><div class="card"><h2>مقایسه سود هدف (۰ تا ۳۰٪)</h2><div class="scroll"><table id="ceo" class="ceo"></table></div>
 <p class="note">سود خالص پیشنهادی برای شرکت‌های گروه فولاد مبارکه ۱۰٪ و برای شرکت‌های خارج از گروه تا ۳۰٪ است. نرخ مالیات عملکرد ۲۵٪، سقف ماده ۳۸ برابر ۱۶٫۶۷٪ و مبالغ بن/مسکن/حق اولاد/تاهل مطابق فایل اکسل ثابت‌اند.</p></div></div>
@@ -173,7 +175,7 @@ function calc(){
  const p=params(),k=consts(p);p.base=baseFromNet(p,k,p.netexp);$('site').value=p.c[1];
  $('employer').value=p.c[1];$('ph').innerHTML=`<b>محاسبه حقوق حکمی (ناخالص) بر اساس قرارداد کارفرما</b><br>نام و نام خانوادگی: <b>${$('ename').value||'-'}</b> &nbsp; شماره پرسنلی: <b>${$('eid').value||'-'}</b> &nbsp; محل خدمت: <b>${$('site').value||'-'}</b><br>شماره قرارداد: <b>${$('contract').value}</b> &nbsp; کارفرما: <b>${p.c[1]}</b> &nbsp; رده: <b>${$('role').value}</b>`;$('subject').value=p.c[2];$('coef').value=p.c[3];$('feebase').value=nf(p.feeK*100);$('B').value=nf(p.B);$('status').value=p.st;
  $('manual').closest('div').style.opacity=$('method').value==='دستی'?1:.5;
- const m=model(p,k,p.base),tg=p.target*p.B;
+ const m=model(p,k,p.base);p.target=p.B>0?m.net/p.B:0;$('target').value=(p.target*100).toFixed(2);$('hkro').value=nf(m.hk);$('basero').value=nf(p.base);const tg=p.target*p.B;
  $('kpis').innerHTML=`<div class="kpi k1"><span>دریافتی ماهانه (B)</span><b>${nf(p.B)}</b></div><div class="kpi k2"><span>هزینه کل شرکت (C)</span><b>${nf(m.C)}</b></div><div class="kpi k3 ${m.net>0?'':'neg'}"><span>سود خالص</span><b>${nf(m.net)}</b></div><div class="kpi k4"><span>حاشیه سود / نسبت B÷C</span><b>${pf(p.B?m.net/p.B:0)} · ${(p.B/m.C).toFixed(2)}</b></div>`;
  pie(p,m);
  $('res').innerHTML=row('وضعیت',m.net>0?'<span class="badge ok">سودده ✔</span>':m.net===0?'سر به سر':'<span class="badge bad">زیان‌ده ✘</span>')+
@@ -186,17 +188,17 @@ function calc(){
  row('سود هدف',nf(tg))+row('فاصله از سود هدف',nf(m.net-tg),m.net>=tg?'ok':'bad')+
  row('نسبت B/C',(p.B/m.C).toFixed(3))+row('نسبت B/A',(p.B/m.empNet).toFixed(3))+row('نسبت C/A',(m.C/m.empNet).toFixed(3))+
  row('سود ناخالص (B − C)',nf(p.B-m.C))+row('حاشیه سود ناخالص بر B',pf(p.B?(p.B-m.C)/p.B:0));
- const s1=solveX(p,k,tg);
- const tgRows=[['سود خالص هدف',nf(tg)],['حقوق (خالص) کارمند (A)',nf(s1.m.empNet)],['حقوق حکمی (ناخالص)',nf(s1.m.hk)],['حقوق پایه (ناخالص)',nf(s1.base)],['بیمه سهم کارگر',nf(s1.m.w)],['مالیات حقوق',nf(s1.m.t)],['هزینه کل شرکت (C)',nf(s1.m.C)],['سود خالص حاصل',nf(s1.m.net)],['وضعیت',s1.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
+ const tgp=num('tgin')/100,s1=solveX(p,k,tgp*p.B);
+ const tgRows=[['سود خالص هدف',nf(tgp*p.B)],['حقوق (خالص) کارمند (A)',nf(s1.m.empNet)],['حقوق حکمی (ناخالص)',nf(s1.m.hk)],['حقوق پایه (ناخالص)',nf(s1.base)],['بیمه سهم کارگر',nf(s1.m.w)],['مالیات حقوق',nf(s1.m.t)],['هزینه کل شرکت (C)',nf(s1.m.C)],['سود خالص حاصل',nf(s1.m.net)],['وضعیت',s1.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
  $('tg').innerHTML=tgRows.map(r=>row(r[0],r[1])).join('');
- const T=[0,.05,.1,.15,.2,.25,.3].map(r=>({r,s:solveX(p,k,r*p.B)}));
+ const T=[p.target,0,.05,.1,.15,.2,.25,.3].map((r,i)=>({r,cur:i==0,s:i==0?{base:p.base,m,ok:true}:solveX(p,k,r*p.B)}));
  const cur=m.hk;
  const CL=[['نرخ سود هدف',t=>pf(t.r)],['سود خالص هدف',t=>nf(t.r*p.B)],['حداکثر حقوق پایه',t=>nf(t.s.base)],['حداکثر حقوق حکمی',t=>nf(t.s.m.hk)],
  ['بیمه سهم کارگر',t=>nf(t.s.m.w)],['مالیات حقوق',t=>nf(t.s.m.t)],['خالص کارمند (A)',t=>nf(t.s.m.empNet)],['هزینه کل شرکت (C)',t=>nf(t.s.m.C)],
  ['سربار + ریسک',t=>nf(t.s.m.over+t.s.m.risk)],['کسری ماده ۳۸',t=>nf(t.s.m.short)],['سود قبل از مالیات',t=>nf(t.s.m.pre)],['مالیات عملکرد',t=>nf(t.s.m.taxc)],
  ['سود خالص',t=>nf(t.s.m.net)],['نسبت B÷حکمی',t=>t.s.m.hk>0?(p.B/t.s.m.hk).toFixed(3):'-'],['نسبت B/C',t=>(p.B/t.s.m.C).toFixed(3)],
- ['اختلاف با حکمی فعلی',t=>nf(t.s.m.hk-cur)],['وضعیت',t=>t.s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
- $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n ${Math.abs(t.r-p.target)<1e-9?'hl':''}">${l[1](t)}</td>`).join('')}</tr>`).join('');
+ ['اختلاف با حکمی فعلی',t=>nf(t.s.m.hk-cur)],['وضعیت',t=>t.cur?'وضع فعلی':t.s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
+ $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n ${t.cur?'hl':''}">${l[1](t)}</td>`).join('')}</tr>`).join('');
  window._s1=s1;document.querySelectorAll('.seg').forEach(x=>x._s&&x._s());save();
 }
 const KEYS=['ename','eid','method','manual','contract','role','exp','netexp','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
