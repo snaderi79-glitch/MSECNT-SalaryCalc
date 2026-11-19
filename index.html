@@ -5,7 +5,7 @@
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MSECNT">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b5ed7'/%3E%3Cpath d='M14 46V30h8v16zm14 0V18h8v28zm14 0V24h8v22z' fill='%23fff'/%3E%3C/svg%3E">
-<title>تحلیل درآمد و هزینه ۱۴۰۵</title>
+<title>محاسبه حقوق حکمی (ناخالص) بر اساس قرارداد کارفرما</title>
 <style>
 :root{--bg:#eef2f7;--card:#fff;--tx:#1b2430;--mut:#6b7686;--pri:#0b5ed7;--pri2:#0a4bb0;--ok:#12a150;--bad:#e03131;--bd:#dbe2ea;--ro:#f1f4f8;--sh:0 2px 10px #1b24301a}
 body.dark{--bg:#0f141b;--card:#1a212b;--tx:#e8edf3;--mut:#93a0b1;--bd:#2c3744;--ro:#222b37;--sh:0 2px 10px #0008}
@@ -47,12 +47,20 @@ th{color:var(--mut);font-weight:600}.ceo th:first-child,.ceo td:first-child{posi
 nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);display:flex;border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom);z-index:9}
 nav button{flex:1;border:0;background:transparent;color:var(--mut);padding:9px 0 8px;font-family:inherit;font-size:12px;cursor:pointer}
 nav button b{display:block;font-size:20px;font-weight:400}nav button.on{color:var(--pri);font-weight:700}
-@media print{header,nav,.btns{display:none}.tab{display:block!important}body{background:#fff;padding:0}}
+.ph{display:none;border:1px solid #999;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px}.note.foot{margin-top:16px;padding:12px;border-top:1px solid var(--bd);text-align:justify}
+.hl{background:#fff3a3!important;color:#000!important;font-weight:700}body.dark .hl{background:#6b5a00!important;color:#fff!important}
+.pie svg{width:270px;height:270px;filter:drop-shadow(0 6px 6px #0004)}
+@media print{.ph{display:block}header,nav,.btns{display:none}.tab{display:block!important}body{background:#fff;padding:0}}
 </style></head><body>
-<header><h1>تحلیل نسبت درآمد به هزینه ۱۴۰۵<small>مبالغ ماهانه به تومان</small></h1>
+<header><h1>محاسبه حقوق حکمی (ناخالص) بر اساس قرارداد کارفرما<small>مبالغ ماهانه به تومان</small></h1>
 <button class="ib" id="dm" title="تم">🌓</button><button class="ib" id="pr" title="چاپ / PDF">🖨</button></header>
 <main>
+<div class="ph" id="ph"></div>
 <div class="tab on" id="t1">
+<div class="card"><h2>اطلاعات کارمند</h2><div class="g">
+<div><label>نام و نام خانوادگی</label><input id="ename"></div>
+<div><label>شماره پرسنلی</label><input id="eid" inputmode="numeric"></div>
+<div><label>محل خدمت</label><input id="site"></div></div></div>
 <div class="card"><h2>الف) دریافتی ماهانه از کارفرما (B)</h2><div class="g">
 <div><label>روش تعیین دریافتی</label><select id="method" hidden><option>بر اساس قرارداد</option><option>دستی</option></select><div class="seg" data-for="method"></div></div>
 <div><label>دریافتی دستی (تومان)</label><input class="money" id="manual" inputmode="decimal"></div>
@@ -91,6 +99,7 @@ nav button b{display:block;font-size:20px;font-weight:400}nav button.on{color:va
 </div>
 <div class="tab" id="t3"><div class="card"><h2>مقایسه سود هدف (۰ تا ۳۰٪)</h2><div class="scroll"><table id="ceo" class="ceo"></table></div>
 <p class="note">سود خالص پیشنهادی برای شرکت‌های گروه فولاد مبارکه ۱۰٪ و برای شرکت‌های خارج از گروه تا ۳۰٪ است. نرخ مالیات عملکرد ۲۵٪، سقف ماده ۳۸ برابر ۱۶٫۶۷٪ و مبالغ بن/مسکن/حق اولاد/تاهل مطابق فایل اکسل ثابت‌اند.</p></div></div>
+<p class="note foot">این فایل بر اساس اطلاعات قراردادهای منعقد شده با کارفرمایان توسط واحد قراردادهای شرکت فنی مهندسی فولاد مبارکه تهیه شده است.</p>
 </main>
 <nav><button class="on" data-tab="t1"><b>📝</b>ورودی</button><button data-tab="t2"><b>📊</b>نتایج</button><button data-tab="t3"><b>⚖️</b>مقایسه</button></nav>
 <script>
@@ -107,6 +116,7 @@ function fillStatic(){
 }
 function setDefaults(){
  const d=DEF;$('method').value=d.method;$('manual').value=d.manual;$('contract').value=d.contract;$('role').value=d.role;$('exp').value=d.exp;
+ for(const k of ['ename','eid','site'])$(k).value=d.blank||'';
  for(const k of ['base','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'])$(k).value=d[k];
 }
 function params(){
@@ -147,14 +157,15 @@ function row(a,b,cls){return `<tr><td>${a}</td><td class="n ${cls||''}">${b}</td
 const COL=['#0b5ed7','#f08c00','#e03131','#9c36b5','#868e96','#12a150'];
 function pie(p,m){
  const it=[['هزینه مستقیم (C)',m.C],['سربار',m.over],['ریسک تأخیر',m.risk],['کسری ماده ۳۸',m.short],['مالیات عملکرد',m.taxc],['سود خالص',Math.max(0,m.net)]].map(x=>[x[0],Math.max(0,x[1])]);
- const tot=it.reduce((s,x)=>s+x[1],0)||1;let off=25,h='<circle cx="21" cy="21" r="15.9" fill="none" stroke="#8884" stroke-width="6"/>';
- it.forEach((x,i)=>{const d=x[1]/tot*100;if(d>0){h+=`<circle cx="21" cy="21" r="15.9" fill="none" stroke="${COL[i]}" stroke-width="6" stroke-dasharray="${d} ${100-d}" stroke-dashoffset="${off}"/>`;off-=d}});
+ const tot=it.reduce((s,x)=>s+x[1],0)||1;let h='';const ring=(cy,col,d,off)=>`<circle cx="21" cy="${cy}" r="15.9" fill="none" stroke="${col}" stroke-width="6" stroke-dasharray="${d} ${100-d}" stroke-dashoffset="${off}"/>`;
+ for(let L=4;L>=1;L--){let off=25;it.forEach((x,i)=>{const d=x[1]/tot*100;if(d>0){h+=ring(21+L*.5,'#000',d,off).replace('stroke="#000"','stroke="'+COL[i]+'" style="filter:brightness(.6)"');off-=d}})}
+ let off=25;it.forEach((x,i)=>{const d=x[1]/tot*100;if(d>0){h+=ring(21,COL[i],d,off);off-=d}});
  $('svg').innerHTML=h;
  $('lg').innerHTML=it.map((x,i)=>`<div><i style="background:${COL[i]}"></i>${x[0]}: <b>${(x[1]/tot*100).toFixed(1)}٪</b></div>`).join('');
 }
 function calc(){
  const p=params(),k=consts(p);
- $('employer').value=p.c[1];$('subject').value=p.c[2];$('coef').value=p.c[3];$('feebase').value=nf(p.feeK*100);$('B').value=nf(p.B);$('status').value=p.st;
+ $('employer').value=p.c[1];$('ph').innerHTML=`<b>محاسبه حقوق حکمی (ناخالص) بر اساس قرارداد کارفرما</b><br>نام و نام خانوادگی: <b>${$('ename').value||'-'}</b> &nbsp; شماره پرسنلی: <b>${$('eid').value||'-'}</b> &nbsp; محل خدمت: <b>${$('site').value||'-'}</b><br>شماره قرارداد: <b>${$('contract').value}</b> &nbsp; کارفرما: <b>${p.c[1]}</b> &nbsp; رده: <b>${$('role').value}</b>`;$('subject').value=p.c[2];$('coef').value=p.c[3];$('feebase').value=nf(p.feeK*100);$('B').value=nf(p.B);$('status').value=p.st;
  $('manual').closest('div').style.opacity=$('method').value==='دستی'?1:.5;
  const m=model(p,k,p.base),tg=p.target*p.B;
  $('kpis').innerHTML=`<div class="kpi k1"><span>دریافتی ماهانه (B)</span><b>${nf(p.B)}</b></div><div class="kpi k2"><span>هزینه کل شرکت (C)</span><b>${nf(m.C)}</b></div><div class="kpi k3 ${m.net>0?'':'neg'}"><span>سود خالص</span><b>${nf(m.net)}</b></div><div class="kpi k4"><span>حاشیه سود / نسبت B÷C</span><b>${pf(p.B?m.net/p.B:0)} · ${(p.B/m.C).toFixed(2)}</b></div>`;
@@ -182,10 +193,10 @@ function calc(){
  ['سربار + ریسک',t=>nf(t.s.m.over+t.s.m.risk)],['کسری ماده ۳۸',t=>nf(t.s.m.short)],['سود قبل از مالیات',t=>nf(t.s.m.pre)],['مالیات عملکرد',t=>nf(t.s.m.taxc)],
  ['سود خالص',t=>nf(t.s.m.net)],['نسبت B÷حکمی',t=>t.s.m.hk>0?(p.B/t.s.m.hk).toFixed(3):'-'],['نسبت B/C',t=>(p.B/t.s.m.C).toFixed(3)],
  ['اختلاف با حکمی فعلی',t=>nf(t.s.m.hk-cur)],['وضعیت',t=>t.s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
- $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n">${l[1](t)}</td>`).join('')}</tr>`).join('');
+ $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n ${Math.abs(t.r-p.target)<1e-9?'hl':''}">${l[1](t)}</td>`).join('')}</tr>`).join('');
  window._s1=s1;document.querySelectorAll('.seg').forEach(x=>x._s&&x._s());save();
 }
-const KEYS=['method','manual','contract','role','exp','base','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
+const KEYS=['ename','eid','site','method','manual','contract','role','exp','base','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
 function save(){try{const o={};KEYS.forEach(k=>o[k]=$(k).value);localStorage.setItem('msecnt1',JSON.stringify(o))}catch(e){}}
 function load(){try{const o=JSON.parse(localStorage.getItem('msecnt1')||'null');if(o)KEYS.forEach(k=>{if(o[k]!=null)$(k).value=o[k]})}catch(e){}}
 function fmtMoney(e){const v=num(e.id);e.value=v?Math.round(v).toLocaleString('en-US'):(e.value===''?'':'0')}
