@@ -25,7 +25,7 @@ input:focus,select:focus{border-color:var(--pri);box-shadow:0 0 0 3px #0b5ed733}
 input[readonly]{background:var(--ro);color:var(--mut)}
 .seg{display:flex;border:1.5px solid var(--bd);border-radius:12px;overflow:hidden}
 .seg button{flex:1;border:0;background:transparent;color:var(--tx);padding:11px 4px;font-size:14px;font-family:inherit;cursor:pointer}
-.seg button.on{background:var(--pri);color:#fff}
+.seg button.on{background:var(--pri);color:#fff;font-weight:700;box-shadow:inset 0 0 0 2px #fff6}.seg button.on::before{content:'✓ '}.seg button+button{border-right:1px solid var(--bd)}
 .step{display:flex;gap:6px}.step input{text-align:center}.step button{width:46px;border:0;border-radius:12px;background:var(--pri);color:#fff;font-size:22px;cursor:pointer}
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
 @media(min-width:700px){.kpis{grid-template-columns:repeat(4,1fr)}}
@@ -183,7 +183,7 @@ function calc(){
  ['سود خالص',t=>nf(t.s.m.net)],['نسبت B÷حکمی',t=>t.s.m.hk>0?(p.B/t.s.m.hk).toFixed(3):'-'],['نسبت B/C',t=>(p.B/t.s.m.C).toFixed(3)],
  ['اختلاف با حکمی فعلی',t=>nf(t.s.m.hk-cur)],['وضعیت',t=>t.s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
  $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n">${l[1](t)}</td>`).join('')}</tr>`).join('');
- window._s1=s1;save();
+ window._s1=s1;document.querySelectorAll('.seg').forEach(x=>x._s&&x._s());save();
 }
 const KEYS=['method','manual','contract','role','exp','base','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
 function save(){try{const o={};KEYS.forEach(k=>o[k]=$(k).value);localStorage.setItem('msecnt1',JSON.stringify(o))}catch(e){}}
