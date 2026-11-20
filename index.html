@@ -139,7 +139,7 @@ function consts(p){
  const B26=16625550*p.days/30*f;
  const hh=(1+p.kids+p.mar)*f;
  const other=p.food*p.days+p.lodge*p.days+p.transp+hh*p.supp+p.bonus+p.cloth;
- return {f,wel,kidsPay,cap:B26*7,B26,other,eid:3*B26/12*f,emp:.23*f,wk:.07*f,riskT:p.risk*p.delay};
+ return {f,wel,kidsPay,cap:B26*p.days/30*7,B26,other,eid:3*B26/12*f,emp:.23*f,wk:.07*f,riskT:p.risk*p.delay};
 }
 function model(p,k,base){
  const hk=base+k.wel, raw=hk-k.kidsPay, ib=Math.min(raw,k.cap), w=k.wk*ib, t=tax(hk-w);
