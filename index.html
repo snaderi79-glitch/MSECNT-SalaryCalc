@@ -50,6 +50,7 @@ nav button b{display:block;font-size:20px;font-weight:400}nav button.on{color:va
 .ph{display:none;border:1px solid #999;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px}.note.foot{margin-top:16px;padding:12px;border-top:1px solid var(--bd);text-align:center}
 .hl{background:#fff3a3!important;color:#000!important;font-weight:700}body.dark .hl{background:#6b5a00!important;color:#fff!important}
 .pie svg{width:270px;height:270px;filter:drop-shadow(0 6px 6px #0004)}
+tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}tr.g td{background:#E2EFDA;color:#000}tr.y td{background:#FFD966;color:#000}
 @media print{.ph{display:block}header,nav,.btns{display:none}.tab{display:block!important}body{background:#fff;padding:0}}
 </style></head><body>
 <header><h1>محاسبه حقوق حکمی (ناخالص) بر اساس قرارداد کارفرما</h1>
@@ -178,16 +179,30 @@ function calc(){
  const m=model(p,k,p.base);p.target=p.B>0?m.net/p.B:0;$('target').value=(p.target*100).toFixed(2);$('hkro').value=nf(m.hk);$('basero').value=nf(p.base);const tg=p.target*p.B;
  $('kpis').innerHTML=`<div class="kpi k1"><span>دریافتی ماهانه (B)</span><b>${nf(p.B)}</b></div><div class="kpi k2"><span>هزینه کل شرکت (C)</span><b>${nf(m.C)}</b></div><div class="kpi k3 ${m.net>0?'':'neg'}"><span>سود خالص</span><b>${nf(m.net)}</b></div><div class="kpi k4"><span>حاشیه سود / نسبت B÷C</span><b>${pf(p.B?m.net/p.B:0)} · ${(p.B/m.C).toFixed(2)}</b></div>`;
  pie(p,m);
- $('res').innerHTML=row('وضعیت',m.net>0?'<span class="badge ok">سودده ✔</span>':m.net===0?'سر به سر':'<span class="badge bad">زیان‌ده ✘</span>')+
- row('دریافتی ماهانه (B)',nf(p.B))+row('حقوق حکمی (ناخالص)',nf(m.hk))+row('مبنای بیمه سقف‌خورده',nf(m.ib))+
- row('بیمه سهم کارگر',nf(m.w))+row('مالیات ماهانه پلکانی',nf(m.t))+row('خالص پرداختی کارمند (A)',nf(m.empNet))+
- row('مجموع بیمه ماهانه (۳۰٪)',nf(.3*m.ib))+row('هزینه کل شرکت برای کارمند (C)',nf(m.C))+
- row('هزینه سربار',nf(m.over))+row('هزینه ریسک تأخیر',nf(m.risk))+row('کسری بیمه (ماده ۳۸)',nf(m.short))+
- row('سود قبل از مالیات',nf(m.pre))+row('مالیات عملکرد شرکت',nf(m.taxc))+
- row('سود خالص پس از مالیات',nf(m.net),m.net>0?'ok':'bad')+row('حاشیه سود خالص بر B',pf(p.B?m.net/p.B:0))+
- row('سود هدف',nf(tg))+row('فاصله از سود هدف',nf(m.net-tg),m.net>=tg?'ok':'bad')+
- row('نسبت B/C',(p.B/m.C).toFixed(3))+row('نسبت B/A',(p.B/m.empNet).toFixed(3))+row('نسبت C/A',(m.C/m.empNet).toFixed(3))+
- row('سود ناخالص (B − C)',nf(p.B-m.C))+row('حاشیه سود ناخالص بر B',pf(p.B?(p.B-m.C)/p.B:0));
+ const H=t=>`<tr class="sh"><td colspan="2">${t}</td></tr>`,R=(a,b,c)=>`<tr class="${c||''}"><td>${a}</td><td class="n">${b}</td></tr>`;
+ const food=p.food*p.days,lodge=p.lodge*p.days,hh=(1+p.kids+p.mar)*k.f,supp=hh*p.supp;
+ const st=m.net>0?'سودده ✔':m.net===0?'سر به سر':'زیان‌ده ✘';
+ $('res').innerHTML=H('ورودی‌ها')+
+ R('دریافتی ماهانه از کارفرما (B)',nf(p.B),'b')+R('حقوق پایه (مبنا، ناخالص)',nf(p.base),'b')+R('وضعیت بیمه‌پذیری',k.f?'بیمه‌پذیر':'بازنشسته')+R('تعداد روزهای ماه',p.days)+R('متاهل',p.mar?'بله':'خیر')+R('تعداد فرزندان',p.kids)+
+ R('بیمه تکمیلی هر نفر',nf(p.supp))+R('پاداش مناسبتی (ماهانه)',nf(p.bonus))+R('لباس و تجهیزات ایمنی',nf(p.cloth))+R('غذای روزانه',nf(p.food))+R('اسکان روزانه',nf(p.lodge))+R('ایاب و ذهاب ماهانه',nf(p.transp))+
+ R('نرخ سربار (از B)',pf(p.over))+R('نرخ سود هدف',pf(p.target))+R('نرخ مالیات عملکرد شرکت','25%')+R('نرخ سقف بیمه قرارداد (ماده ۳۸)','16.67%')+
+ H('ب) نحوه محاسبه حقوق و دستمزد')+
+ R('مجموع حق اولاد',nf(k.kidsPay))+R('مجموع رفاهیات (مسکن+بن+تاهل+حق اولاد)',nf(k.wel))+R('حقوق حکمی (ناخالص)',nf(m.hk),'b')+
+ R('مبنای بیمه خام',nf(m.hk-k.kidsPay))+R('سقف بیمه تعدیل‌شده ماه',nf(k.cap))+R('مبنای بیمه سقف‌خورده',nf(m.ib))+
+ R('بیمه سهم کارگر (۷٪)',nf(m.w))+R('بیمه سهم کارفرما (۲۳٪)',nf(k.emp*m.ib))+R('مجموع بیمه ماهانه (۳۰٪)',nf(m.ins))+
+ R('مالیات ماهانه پلکانی ۱۴۰۵',nf(m.t))+R('خالص پرداختی کارمند (A)',nf(m.empNet),'b g')+
+ H('ج) هزینه کل شرکت برای کارمند (C)')+
+ R('مجموع بیمه‌های ماهانه (کارگر+کارفرما)',nf(m.ins))+R('عیدی ماهانه (۳×سقف بیمه ÷ ۱۲)',nf(k.eid))+R('سنوات ماهانه (حقوق پایه ÷ ۱۲)',nf(p.base/12*k.f))+R('ذخیره مرخصی ماهانه',nf(m.hk/12*k.f))+
+ R('هزینه‌ها (غذا+اسکان+ایاب‌وذهاب+بیمه تکمیلی+پاداش+لباس)',nf(k.other),'b')+
+ R('&nbsp;&nbsp;↳ غذا',nf(food))+R('&nbsp;&nbsp;↳ اسکان',nf(lodge))+R('&nbsp;&nbsp;↳ ایاب و ذهاب',nf(p.transp))+R('&nbsp;&nbsp;↳ بیمه تکمیلی',nf(supp))+R('&nbsp;&nbsp;↳ پاداش',nf(p.bonus))+R('&nbsp;&nbsp;↳ لباس',nf(p.cloth))+
+ R('حقوق حکمی',nf(m.hk))+R('هزینه کل شرکت (C)',nf(m.C),'b y')+
+ H('د) تحلیل سودآوری قرارداد بر مبنای B ثابت')+
+ R('هزینه سربار',nf(m.over))+R('هزینه ریسک تأخیر پرداخت',nf(m.risk))+R('سقف بیمه قرارداد (ماده ۳۸)',nf(m.ceil))+R('کسری بیمه',nf(m.short))+
+ R('سود قبل از مالیات',nf(m.pre))+R('مالیات عملکرد شرکت',nf(m.taxc))+R('سود خالص پس از مالیات',nf(m.net),'b g '+(m.net>0?'ok':'bad'))+
+ R('حاشیه سود خالص بر B',pf(p.B?m.net/p.B:0))+R('سود هدف (نرخ × B)',nf(tg))+R('فاصله از سود هدف',nf(m.net-tg),m.net>=tg?'ok':'bad')+R('وضعیت سودآوری',st,'b y')+
+ H('نسبت‌های کلیدی')+
+ R('نسبت B/C',(p.B/m.C).toFixed(3),'b y')+R('نسبت B/A',(p.B/m.empNet).toFixed(3),'b')+R('نسبت C/A',(m.C/m.empNet).toFixed(3),'b')+
+ R('سود ناخالص (B − C)',nf(p.B-m.C))+R('حاشیه سود ناخالص بر B',pf(p.B?(p.B-m.C)/p.B:0));
  const tgp=num('tgin')/100,s1=solveX(p,k,tgp*p.B);
  const tgRows=[['سود خالص هدف',nf(tgp*p.B)],['حقوق (خالص) کارمند (A)',nf(s1.m.empNet)],['حقوق حکمی (ناخالص)',nf(s1.m.hk)],['حقوق پایه (ناخالص)',nf(s1.base)],['بیمه سهم کارگر',nf(s1.m.w)],['مالیات حقوق',nf(s1.m.t)],['هزینه کل شرکت (C)',nf(s1.m.C)],['سود خالص حاصل',nf(s1.m.net)],['وضعیت',s1.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
  $('tg').innerHTML=tgRows.map(r=>row(r[0],r[1])).join('');
@@ -217,7 +232,9 @@ document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const e=$(b.dat
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
 $('go').onclick=()=>tab('t2');
 $('setmax').onclick=()=>{$('netexp').value=Math.floor(window._s1.m.empNet);calc();sync()};
-$('pr').onclick=()=>print();
+$('pr').onclick=()=>{calc();const h='<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>گزارش</title><style>body{font-family:Tahoma,sans-serif;margin:12px;font-size:13px}table{width:100%;border-collapse:collapse}td{border:1px solid #ccc;padding:5px}td.n{direction:ltr;text-align:left}tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}tr.g td{background:#E2EFDA}tr.y td{background:#FFD966}.ph{margin-bottom:10px}.no{display:none}@media print{.no{display:none}}button{padding:10px;margin-bottom:8px}</style><body><button class="no" style="display:block" onclick="print()">چاپ / ذخیره PDF</button><div class="ph">'+$('ph').innerHTML+'</div><table>'+$('res').innerHTML+'</table></body></html>';
+ try{const w=window.open('','_blank');if(w){w.document.open();w.document.write(h);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},400);return}}catch(e){}
+ try{window.print()}catch(e){alert('چاپ پشتیبانی نمی‌شود؛ از منوی مرورگر «Share/Print» استفاده کنید.')}};
 $('dm').onclick=()=>{document.body.classList.toggle('dark');try{localStorage.setItem('msecnt_dark',document.body.classList.contains('dark')?1:0)}catch(e){}};
 try{if(localStorage.getItem('msecnt_dark')==1)document.body.classList.add('dark')}catch(e){}
 fillStatic();setDefaults();load();segs();calc();sync();
