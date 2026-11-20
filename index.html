@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#0b5ed7"><meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MSECNT">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -239,4 +240,6 @@ $('pr').onclick=()=>{calc();const h='<!doctype html><html lang="fa" dir="rtl"><m
 $('dm').onclick=()=>{document.body.classList.toggle('dark');try{localStorage.setItem('msecnt_dark',document.body.classList.contains('dark')?1:0)}catch(e){}};
 try{if(localStorage.getItem('msecnt_dark')==1)document.body.classList.add('dark')}catch(e){}
 fillStatic();setDefaults();load();segs();calc();sync();
-</script></body></html>
+</script>
+<script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body></html>
