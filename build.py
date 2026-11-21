@@ -14,7 +14,10 @@ x=wb['ورود اطلاعات ']
 d=dict(method=x['B3'].value,manual=x['B4'].value,contract=x['B5'].value,role=x['B9'].value,exp=x['B10'].value,netexp=78083816,
  ins=x['B20'].value,days=x['B21'].value,married=x['B22'].value,kids=x['B23'].value,supp=x['B24'].value,bonus=x['B25'].value,cloth=x['B26'].value,
  food=x['B27'].value,lodge=x['B28'].value,transp=x['B29'].value,over=round(x['B30'].value*100,4),target=round(x['B31'].value*100,4),risk=round((x['B33'].value or 0)*100,4),delay=x['B34'].value)
+import os,hashlib,sys
+if not os.environ.get('ADMIN_PASS'): sys.exit('ADMIN_PASS لازم است')
+hash_=hashlib.sha256(os.environ['ADMIN_PASS'].encode()).hexdigest()
 html=open('app_tpl.html',encoding='utf-8').read()
-html=html.replace('__CON__',json.dumps(con,ensure_ascii=False)).replace('__FEE__',json.dumps(fee,ensure_ascii=False)).replace('__DEF__',json.dumps(d,ensure_ascii=False))
+html=html.replace('__CON__',json.dumps(con,ensure_ascii=False)).replace('__FEE__',json.dumps(fee,ensure_ascii=False)).replace('__DEF__',json.dumps(d,ensure_ascii=False)).replace('__ADMIN_HASH__',hash_)
 open('index.html','w',encoding='utf-8').write(html)
 print(len(con),list(fee),d)

@@ -106,9 +106,11 @@ tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}t
 <p class="note">سود خالص پیشنهادی برای شرکت‌های گروه فولاد مبارکه ۱۰٪ و برای شرکت‌های خارج از گروه تا ۳۰٪ است. نرخ مالیات عملکرد ۲۵٪، سقف ماده ۳۸ برابر ۱۶٫۶۷٪ و مبالغ بن/مسکن/حق اولاد/تاهل مطابق فایل اکسل ثابت‌اند.</p></div></div>
 <p class="note foot">(این فایل بر اساس اطلاعات قراردادهای منعقد شده با کارفرمایان توسط واحد قراردادهای شرکت فنی مهندسی فولاد مبارکه تهیه شده است @1405)</p>
 </main>
-<nav><button class="on" data-tab="t1"><b>📝</b>ورودی</button><button data-tab="t2"><b>📊</b>نتایج</button><button data-tab="t4"><b>🎯</b>سود هدف</button><button data-tab="t3"><b>⚖️</b>مقایسه</button></nav>
+<div class="tab" id="t5"><div class="card"><h2>مدیریت قراردادها و ضریب‌ها</h2><p class="muted">تغییرات فقط در همین مرورگر ذخیره می‌شود. برای اعمال روی همه کاربران، فایل JSON را دانلود کنید و به سازنده بدهید.</p><div class="scroll" id="adm"></div><div class="btns"><button id="addc">+ قرارداد جدید</button><button id="savec">ذخیره در این مرورگر</button><button id="expc">دانلود JSON</button><button id="resc">بازگشت به پیش‌فرض</button></div><p id="admst" class="muted"></p></div></div>
+<nav><button class="on" data-tab="t1"><b>📝</b>ورودی</button><button data-tab="t2"><b>📊</b>نتایج</button><button data-tab="t4"><b>🎯</b>سود هدف</button><button data-tab="t3"><b>⚖️</b>مقایسه</button><button data-tab="t5"><b>🔐</b>مدیر</button></nav>
 <script>
-const CON=__CON__, FEE=__FEE__, DEF=__DEF__;
+let CON=__CON__;const FEE=__FEE__, DEF=__DEF__;const ADMIN_HASH="__ADMIN_HASH__";
+try{const o=JSON.parse(localStorage.getItem('msecnt_con')||'null');if(Array.isArray(o)&&o.length)CON=o}catch(e){}
 const TAX=[[40e6,.1],[80e6,.05],[100e6,.05],[120e6,.05],[140e6,.05]];
 const $=i=>document.getElementById(i);
 const nf=v=>isFinite(v)?Math.round(v).toLocaleString('en-US'):String(v);
@@ -231,7 +233,22 @@ function tab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle
 document.querySelectorAll('input:not([readonly]),select').forEach(e=>{e.addEventListener('input',()=>{calc();sync()});e.addEventListener('change',()=>{calc();sync()})});
 document.querySelectorAll('.money').forEach(e=>{e.addEventListener('focus',()=>{const v=num(e.id);e.value=v||'';setTimeout(()=>e.select&&e.select(),0)});e.addEventListener('blur',()=>fmtMoney(e))});
 document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const e=$(b.dataset.st);e.value=Math.max(0,num(b.dataset.st)+ +b.dataset.d);calc();sync()});
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>b.dataset.tab==='t5'?openAdmin():tab(b.dataset.tab));
+let adminOK=false;
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function openAdmin(){
+ if(!adminOK){const p=prompt('رمز مدیر را وارد کنید');if(p===null)return;
+  try{adminOK=(await sha(p))===ADMIN_HASH}catch(e){alert('این بخش فقط روی https یا localhost کار می‌کند');return}
+  if(!adminOK){alert('رمز نادرست است');return}}
+ renderAdmin();tab('t5')}
+function renderAdmin(){
+ $('adm').innerHTML='<table class="ceo"><tr><th>ردیف</th><th>شماره قرارداد</th><th>کارفرما</th><th>موضوع قرارداد</th><th>ضریب</th><th></th></tr>'+CON.map((c,i)=>`<tr><td>${i+1}</td><td><input data-i="${i}" data-k="0" value="${c[0]}"></td><td><input data-i="${i}" data-k="1" value="${c[1]}"></td><td><input data-i="${i}" data-k="2" value="${c[2]}"></td><td><input data-i="${i}" data-k="3" value="${c[3]}"></td><td><button data-del="${i}">حذف</button></td></tr>`).join('')+'</table>'}
+$('adm').oninput=e=>{const i=+e.target.dataset.i,k=+e.target.dataset.k;if(isNaN(i)||!CON[i])return;CON[i][k]=k===3?(parseFloat(String(e.target.value).replace(',','.'))||0):e.target.value};
+$('adm').onclick=e=>{const d=e.target.dataset.del;if(d!=null){CON.splice(+d,1);renderAdmin()}};
+$('addc').onclick=()=>{CON.push(['','','',0]);renderAdmin()};
+$('savec').onclick=()=>{try{localStorage.setItem('msecnt_con',JSON.stringify(CON));const v=$('contract').value;fillStatic();$('contract').value=v;calc();$('admst').textContent='ذخیره شد ('+CON.length+' قرارداد) در این مرورگر.'}catch(e){$('admst').textContent='ذخیره نشد.'}};
+$('expc').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(CON,null,1)],{type:'application/json'}));a.download='contracts.json';a.click()};
+$('resc').onclick=()=>{if(confirm('قراردادهای ذخیره‌شده در این مرورگر حذف شود؟')){localStorage.removeItem('msecnt_con');location.reload()}};
 $('go').onclick=()=>tab('t2');
 $('setmax').onclick=()=>{$('netexp').value=Math.floor(window._s1.m.empNet);calc();sync()};
 $('pr').onclick=()=>{calc();const h='<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>گزارش</title><style>body{font-family:Tahoma,sans-serif;margin:12px;font-size:13px}table{width:100%;border-collapse:collapse}td{border:1px solid #ccc;padding:5px}td.n{direction:ltr;text-align:left}tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}tr.g td{background:#E2EFDA}tr.y td{background:#FFD966}.ph{margin-bottom:10px}.no{display:none}@media print{.no{display:none}}button{padding:10px;margin-bottom:8px}</style><body><button class="no" style="display:block" onclick="print()">چاپ / ذخیره PDF</button><div class="ph">'+$('ph').innerHTML+'</div><table style="margin-bottom:12px;font-size:15px"><tr class="sh"><td colspan="2">خلاصه نتایج</td></tr>'+window._sum.map(r=>'<tr class="b g"><td>'+r[0]+'</td><td class="n">'+r[1]+'</td></tr>').join('')+'</table><table>'+$('res').innerHTML+'</table></body></html>';
