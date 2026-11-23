@@ -66,6 +66,9 @@ tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}t
 <div class="card"><h2>الف) دریافتی ماهانه از کارفرما (B)</h2><div class="g">
 <div><label>روش تعیین دریافتی</label><select id="method" hidden><option>بر اساس قرارداد</option><option>دستی</option></select><div class="seg" data-for="method"></div></div>
 <div><label>دریافتی دستی (تومان)</label><input class="money" id="manual" inputmode="decimal"></div>
+<div><label>نوع ورودی دستی</label><select id="mmode" hidden><option>ماهانه</option><option>ساعتی</option></select><div class="seg" data-for="mmode"></div></div>
+<div><label>نرخ حق‌الزحمه ساعتی (تومان)</label><input class="money" id="hrate" inputmode="decimal"></div>
+<div><label>ساعات کار در ماه</label><input id="hours" inputmode="decimal"></div>
 <div><label>شماره قرارداد</label><select id="contract"></select></div>
 <div><label>کارفرما</label><input id="employer" readonly></div>
 <div><label>موضوع قرارداد</label><input id="subject" readonly></div>
@@ -122,7 +125,7 @@ function fillStatic(){
  $('role').innerHTML=Object.keys(FEE).map(k=>`<option>${k}</option>`).join('');
 }
 function setDefaults(){
- const d=DEF;$('method').value=d.method;$('manual').value=d.manual;$('contract').value=d.contract;$('role').value=d.role;$('exp').value=d.exp;
+ const d=DEF;$('method').value=d.method;$('manual').value=d.manual;$('mmode').value='ماهانه';$('hrate').value='';$('hours').value='176';$('contract').value=d.contract;$('role').value=d.role;$('exp').value=d.exp;
  for(const k of ['ename','eid','site'])$(k).value=d.blank||'';
  for(const k of ['netexp','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'])$(k).value=d[k];
 }
@@ -131,7 +134,7 @@ function params(){
  const exp=num('exp'),idx=Math.min(Math.floor(exp),25);
  const feeK=(FEE[$('role').value]||[])[idx]||0;
  const method=$('method').value;
- const B=method==='دستی'?num('manual'):c[3]*feeK*100;
+ const B=method==='دستی'?($('mmode').value==='ساعتی'?num('hrate')*num('hours'):num('manual')):c[3]*feeK*100;
  let st=method==='دستی'?'حالت دستی فعال است':feeK===0?'برای این رده و سابقه نرخی تعریف نشده است':c[3]===0?'ضریب این قرارداد هنوز وارد نشده':'محاسبه بر اساس قرارداد';
  return {c,feeK,B,st,ins:+$('ins').value,days:+$('days').value,mar:+$('married').value,kids:num('kids'),supp:num('supp'),bonus:num('bonus'),cloth:num('cloth'),
   food:num('food'),lodge:num('lodge'),transp:num('transp'),over:num('over')/100,target:num('target')/100,risk:num('risk')/100,delay:num('delay'),netexp:num('netexp'),base:0};
@@ -178,7 +181,12 @@ function pie(p,m){
 function calc(){
  const p=params(),k=consts(p);p.base=baseFromNet(p,k,p.netexp);$('site').value=p.c[1];
  $('employer').value=p.c[1];$('ph').innerHTML=`<b>محاسبه حقوق حکمی (ناخالص) بر اساس قرارداد کارفرما</b><br>نام و نام خانوادگی: <b>${$('ename').value||'-'}</b> &nbsp; شماره پرسنلی: <b>${$('eid').value||'-'}</b> &nbsp; محل خدمت: <b>${$('site').value||'-'}</b><br>شماره قرارداد: <b>${$('contract').value}</b> &nbsp; کارفرما: <b>${p.c[1]}</b> &nbsp; رده: <b>${$('role').value}</b>`;$('subject').value=p.c[2];$('coef').value=p.c[3];$('feebase').value=nf(p.feeK*100);$('B').value=nf(p.B);$('status').value=p.st;
- $('manual').closest('div').style.opacity=$('method').value==='دستی'?1:.5;
+ {const dm=$('method').value==='دستی',hr=$('mmode').value==='ساعتی';
+ $('mmode').closest('div').style.opacity=dm?1:.5;
+ for(const i of ['manual','hrate','hours'])$(i).closest('div').style.opacity=dm?1:.5;
+ $('manual').closest('div').style.display=hr?'none':'';
+ $('hrate').closest('div').style.display=hr?'':'none';$('hours').closest('div').style.display=hr?'':'none';
+ $('mmode').closest('div').style.display=dm?'':'none';}
  const m=model(p,k,p.base);p.target=p.B>0?m.net/p.B:0;$('target').value=(p.target*100).toFixed(2);$('hkro').value=nf(m.hk);$('basero').value=nf(p.base);const tg=p.target*p.B;
  $('kpis').innerHTML=`<div class="kpi k1"><span>دریافتی ماهانه (B)</span><b>${nf(p.B)}</b></div><div class="kpi k2"><span>هزینه کل شرکت (C)</span><b>${nf(m.C)}</b></div><div class="kpi k3 ${m.net>0?'':'neg'}"><span>سود خالص</span><b>${nf(m.net)}</b></div><div class="kpi k4"><span>حاشیه سود / نسبت B÷C</span><b>${pf(p.B?m.net/p.B:0)} · ${(p.B/m.C).toFixed(2)}</b></div>`;
  pie(p,m);
@@ -220,7 +228,7 @@ function calc(){
  $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n ${t.cur?'hl':''}">${l[1](t)}</td>`).join('')}</tr>`).join('');
  window._s1=s1;document.querySelectorAll('.seg').forEach(x=>x._s&&x._s());save();
 }
-const KEYS=['ename','eid','method','manual','contract','role','exp','netexp','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
+const KEYS=['ename','eid','method','manual','mmode','hrate','hours','contract','role','exp','netexp','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
 function save(){try{const o={};KEYS.forEach(k=>o[k]=$(k).value);localStorage.setItem('msecnt2',JSON.stringify(o))}catch(e){}}
 function load(){try{const o=JSON.parse(localStorage.getItem('msecnt2')||'null');if(o)KEYS.forEach(k=>{if(o[k]!=null)$(k).value=o[k]})}catch(e){}}
 function fmtMoney(e){const v=num(e.id);e.value=v?Math.round(v).toLocaleString('en-US'):(e.value===''?'':'0')}
@@ -251,7 +259,7 @@ $('expc').onclick=()=>{const a=document.createElement('a');a.href=URL.createObje
 $('resc').onclick=()=>{if(confirm('قراردادهای ذخیره‌شده در این مرورگر حذف شود؟')){localStorage.removeItem('msecnt_con');location.reload()}};
 $('go').onclick=()=>tab('t2');
 $('setmax').onclick=()=>{$('netexp').value=Math.floor(window._s1.m.empNet);calc();sync()};
-$('pr').onclick=()=>{calc();const h='<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>گزارش</title><style>body{font-family:Tahoma,sans-serif;margin:12px;font-size:13px}table{width:100%;border-collapse:collapse}td{border:1px solid #ccc;padding:5px}td.n{direction:ltr;text-align:left}tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}tr.g td{background:#E2EFDA}tr.y td{background:#FFD966}.ph{margin-bottom:10px}.no{display:none}@media print{.no{display:none}}button{padding:10px;margin-bottom:8px}</style><body><button class="no" style="display:block" onclick="print()">چاپ / ذخیره PDF</button><div class="ph">'+$('ph').innerHTML+'</div><table style="margin-bottom:12px;font-size:15px"><tr class="sh"><td colspan="2">خلاصه نتایج</td></tr>'+window._sum.map(r=>'<tr class="b g"><td>'+r[0]+'</td><td class="n">'+r[1]+'</td></tr>').join('')+'</table><table>'+$('res').innerHTML+'</table></body></html>';
+$('pr').onclick=()=>{calc();const h='<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>گزارش</title><style>body{font-family:Tahoma,sans-serif;margin:12px;font-size:13px}table{width:100%;border-collapse:collapse}td{border:1px solid #ccc;padding:5px}td.n{direction:ltr;text-align:left}tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}tr.g td{background:#E2EFDA}tr.y td{background:#FFD966}.ph{margin-bottom:10px}.no{display:none}@media print{.no{display:none}}button{padding:10px;margin-bottom:8px}</style><body><button class="no" style="display:block" onclick="print()">چاپ / ذخیره PDF</button><div class="ph">'+$('ph').innerHTML+(($('method').value==='دستی'&&$('mmode').value==='ساعتی')?'<br>نرخ حق‌الزحمه ساعتی: <b>'+nf(num('hrate'))+' تومان</b> &nbsp; ساعات کار در ماه: <b>'+nf(num('hours'))+'</b>':'')+'</div><table>'+$('res').innerHTML+'</table></body></html>';
  try{const w=window.open('','_blank');if(w){w.document.open();w.document.write(h);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},400);return}}catch(e){}
  try{window.print()}catch(e){alert('چاپ پشتیبانی نمی‌شود؛ از منوی مرورگر «Share/Print» استفاده کنید.')}};
 $('dm').onclick=()=>{document.body.classList.toggle('dark');try{localStorage.setItem('msecnt_dark',document.body.classList.contains('dark')?1:0)}catch(e){}};
