@@ -1,0 +1,1 @@
+{"name":"msecnt","private":true,"scripts":{"check":"tsc -p .","build":"python3 build.py"},"devDependencies":{"typescript":"^5","esbuild":"^0.24"}}

@@ -2,11 +2,13 @@ import {CON as CON0, FEE, DEF, ADMIN_HASH} from "./data";
 let CON: any[] = CON0;
 try{const o=JSON.parse(localStorage.getItem('msecnt_con')||'null');if(Array.isArray(o)&&o.length)CON=o}catch(e){}
 const TAX=[[40e6,.1],[80e6,.05],[100e6,.05],[120e6,.05],[140e6,.05]];
-const $=i=>document.getElementById(i);
-const nf=v=>isFinite(v)?Math.round(v).toLocaleString('en-US'):String(v);
-const pf=v=>(v*100).toFixed(2)+'%';
-const num=i=>{const s=String($(i).value).replace(/[,٬\s]/g,'').replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c));const v=parseFloat(s);return isNaN(v)?0:v};
-const tax=a=>TAX.reduce((s,[f,g])=>s+(a>f?(a-f)*g:0),0);
+const $=(i:string):any=>document.getElementById(i);
+const qa=(q:string):any[]=>Array.from(document.querySelectorAll(q));
+declare global{interface Window{_hr:any;_sum:any;_s1:any}}
+const nf=(v:any)=>isFinite(v)?Math.round(v).toLocaleString('en-US'):String(v);
+const pf=(v:any)=>(v*100).toFixed(2)+'%';
+const num=(i:string)=>{const s=String($(i).value).replace(/[,٬\s]/g,'').replace(/[۰-۹]/g,(c:string)=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/[٠-٩]/g,(c:string)=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)));const v=parseFloat(s);return isNaN(v)?0:v};
+const tax=(a:any)=>TAX.reduce((s,[f,g])=>s+(a>f?(a-f)*g:0),0);
 function fillStatic(){
  $('contract').innerHTML=CON.map(c=>`<option>${c[0]}</option>`).join('');
  $('role').innerHTML=Object.keys(FEE).map(k=>`<option>${k}</option>`).join('');
@@ -26,7 +28,7 @@ function params(){
  return {c,feeK,B,st,ins:+$('ins').value,days:+$('days').value,mar:+$('married').value,kids:num('kids'),supp:num('supp'),bonus:num('bonus'),cloth:num('cloth'),
   food:num('food'),lodge:num('lodge'),transp:num('transp'),over:num('over')/100,target:num('target')/100,risk:num('risk')/100,delay:num('delay'),netexp:num('netexp'),base:0};
 }
-function consts(p){
+function consts(p:any){
  const f=p.ins;
  const wel=3e6*f+2.2e6*f+1662554*f*p.kids*f+5e5*p.mar*f;  // مسکن+بن+حق اولاد+تاهل
  const kidsPay=1662554*f*p.kids*f;
@@ -35,7 +37,7 @@ function consts(p){
  const other=p.food*p.days+p.lodge*p.days+p.transp+hh*p.supp+p.bonus+p.cloth;
  return {f,wel,kidsPay,cap:B26*p.days/30*7,B26,other,eid:3*B26/12*f,emp:.23*f,wk:.07*f,riskT:p.risk*p.delay};
 }
-function model(p,k,base){
+function model(p:any,k:any,base:any){
  const hk=base+k.wel, raw=hk-k.kidsPay, ib=Math.min(raw,k.cap), w=k.wk*ib, t=tax(hk-w);
  const ins=k.emp*ib+w;
  const C=ins+k.eid+base/12*k.f+hk/12*k.f+k.other+hk;
@@ -43,23 +45,23 @@ function model(p,k,base){
  const short=Math.max(0,ceil-.3*ib), pre=p.B-C-over-short-risk, taxc=Math.max(0,.25*pre);
  return {hk,ib,w,t,ins,C,over,risk,short,pre,taxc,net:pre-taxc,empNet:hk-w-t,ceil};
 }
-function baseFromNet(p,k,net){
+function baseFromNet(p:any,k:any,net:any){
  let lo=0,hi=1e11;
  for(let i=0;i<100;i++){const b=(lo+hi)/2,m=model(p,k,b);if(m.empNet<net)lo=b;else hi=b}
  return (lo+hi)/2;
 }
-function solveX(p,k,tg){
+function solveX(p:any,k:any,tg:any){
  let lo=0,hi=p.B,D,M;
  for(let i=0;i<50;i++){D=(lo+hi)/2;M=model(p,k,D).net-tg;if(i<49){if(M>=0)lo=D;else hi=D}}
- const ans=M>=0?D:lo;
+ const ans=(M as number)>=0?D:lo;
  const ctl=model(p,k,0).net-tg;
  return {base:ans,m:model(p,k,ans),ok:ctl>=0};
 }
-function row(a,b,cls){return `<tr><td>${a}</td><td class="n ${cls||''}">${b}</td></tr>`}
+function row(a:any,b:any,cls:any){return `<tr><td>${a}</td><td class="n ${cls||''}">${b}</td></tr>`}
 const COL=['#0b5ed7','#f08c00','#e03131','#9c36b5','#868e96','#12a150'];
-function pie(p,m){
+function pie(p:any,m:any){
  const it=[['هزینه مستقیم (C)',m.C],['سربار',m.over],['ریسک تأخیر',m.risk],['کسری ماده ۳۸',m.short],['مالیات عملکرد',m.taxc],['سود خالص',Math.max(0,m.net)]].map(x=>[x[0],Math.max(0,x[1])]);
- const tot=it.reduce((s,x)=>s+x[1],0)||1;let h='';const ring=(cy,col,d,off)=>`<circle cx="21" cy="${cy}" r="15.9" fill="none" stroke="${col}" stroke-width="6" stroke-dasharray="${d} ${100-d}" stroke-dashoffset="${off}"/>`;
+ const tot=it.reduce((s,x)=>s+x[1],0)||1;let h='';const ring=(cy:any,col:any,d:any,off:any)=>`<circle cx="21" cy="${cy}" r="15.9" fill="none" stroke="${col}" stroke-width="6" stroke-dasharray="${d} ${100-d}" stroke-dashoffset="${off}"/>`;
  for(let L=4;L>=1;L--){let off=25;it.forEach((x,i)=>{const d=x[1]/tot*100;if(d>0){h+=ring(21+L*.5,'#000',d,off).replace('stroke="#000"','stroke="'+COL[i]+'" style="filter:brightness(.6)"');off-=d}})}
  let off=25;it.forEach((x,i)=>{const d=x[1]/tot*100;if(d>0){h+=ring(21,COL[i],d,off);off-=d}});
  $('svg').innerHTML=h;
@@ -80,7 +82,7 @@ function calc(){
  window._sum=[['دریافتی از کارفرما (B)',nf(p.B)],['حقوق پایه',nf(p.base)],['حقوق حکمی (ناخالص)',nf(m.hk)],['حقوق خالص کارمند (A)',nf(m.empNet)]];
  const hmanual=$('method').value==='دستی'&&$('mmode').value==='ساعتی';
  window._hr=hmanual?{rate:num('hrate'),hours:num('hours'),src:'ورودی کاربر'}:{rate:m.hk/176,hours:176,src:'حقوق حکمی ÷ ۱۷۶'};
- const H=t=>`<tr class="sh"><td colspan="2">${t}</td></tr>`,R=(a,b,c)=>`<tr class="${c||''}"><td>${a}</td><td class="n">${b}</td></tr>`;
+ const H=(t:any)=>`<tr class="sh"><td colspan="2">${t}</td></tr>`,R=(a:any,b:any,c?:string)=>`<tr class="${c||''}"><td>${a}</td><td class="n">${b}</td></tr>`;
  const food=p.food*p.days,lodge=p.lodge*p.days,hh=(1+p.kids+p.mar)*k.f,supp=hh*p.supp;
  const st=m.net>0?'سودده ✔':m.net===0?'سر به سر':'زیان‌ده ✘';
  $('res').innerHTML=H('خلاصه نتایج')+R('دریافتی از کارفرما (B)',nf(p.B),'b')+R('حقوق پایه',nf(p.base),'b')+R('حقوق حکمی (ناخالص)',nf(m.hk),'b')+R('حقوق خالص کارمند (A)',nf(m.empNet),'b')+H('ورودی‌ها')+
@@ -106,33 +108,33 @@ function calc(){
  R('سود ناخالص (B − C)',nf(p.B-m.C))+R('حاشیه سود ناخالص بر B',pf(p.B?(p.B-m.C)/p.B:0));
  const tgp=num('tgin')/100,s1=solveX(p,k,tgp*p.B);
  const tgRows=[['سود خالص هدف',nf(tgp*p.B)],['حقوق (خالص) کارمند (A)',nf(s1.m.empNet)],['حقوق حکمی (ناخالص)',nf(s1.m.hk)],['حقوق پایه (ناخالص)',nf(s1.base)],['بیمه سهم کارگر',nf(s1.m.w)],['مالیات حقوق',nf(s1.m.t)],['هزینه کل شرکت (C)',nf(s1.m.C)],['سود خالص حاصل',nf(s1.m.net)],['وضعیت',s1.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
- $('tg').innerHTML=tgRows.map(r=>row(r[0],r[1])).join('');
+ $('tg').innerHTML=tgRows.map((r:any)=>(row as any)(r[0],r[1])).join('');
  const T=[p.target,0,.05,.1,.15,.2,.25,.3].map((r,i)=>({r,cur:i==0,s:i==0?{base:p.base,m,ok:true}:solveX(p,k,r*p.B)}));
  const cur=m.hk;
- const CL=[['نرخ سود هدف',t=>pf(t.r)],['سود خالص هدف',t=>nf(t.r*p.B)],['حداکثر حقوق پایه',t=>nf(t.s.base)],['حداکثر حقوق حکمی',t=>nf(t.s.m.hk)],
- ['بیمه سهم کارگر',t=>nf(t.s.m.w)],['مالیات حقوق',t=>nf(t.s.m.t)],['خالص کارمند (A)',t=>nf(t.s.m.empNet)],['هزینه کل شرکت (C)',t=>nf(t.s.m.C)],
- ['سربار + ریسک',t=>nf(t.s.m.over+t.s.m.risk)],['کسری ماده ۳۸',t=>nf(t.s.m.short)],['سود قبل از مالیات',t=>nf(t.s.m.pre)],['مالیات عملکرد',t=>nf(t.s.m.taxc)],
- ['سود خالص',t=>nf(t.s.m.net)],['نسبت B÷حکمی',t=>t.s.m.hk>0?(p.B/t.s.m.hk).toFixed(3):'-'],['نسبت B/C',t=>(p.B/t.s.m.C).toFixed(3)],
- ['اختلاف با حکمی فعلی',t=>nf(t.s.m.hk-cur)],['وضعیت',t=>t.cur?'وضع فعلی':t.s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
- $('ceo').innerHTML=CL.map(l=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n ${t.cur?'hl':''}">${l[1](t)}</td>`).join('')}</tr>`).join('');
- window._s1=s1;document.querySelectorAll('.seg').forEach(x=>x._s&&x._s());save();
+ const CL=[['نرخ سود هدف',(t:any)=>pf(t.r)],['سود خالص هدف',(t:any)=>nf(t.r*p.B)],['حداکثر حقوق پایه',(t:any)=>nf(t.s.base)],['حداکثر حقوق حکمی',(t:any)=>nf(t.s.m.hk)],
+ ['بیمه سهم کارگر',(t:any)=>nf(t.s.m.w)],['مالیات حقوق',(t:any)=>nf(t.s.m.t)],['خالص کارمند (A)',(t:any)=>nf(t.s.m.empNet)],['هزینه کل شرکت (C)',(t:any)=>nf(t.s.m.C)],
+ ['سربار + ریسک',(t:any)=>nf(t.s.m.over+t.s.m.risk)],['کسری ماده ۳۸',(t:any)=>nf(t.s.m.short)],['سود قبل از مالیات',(t:any)=>nf(t.s.m.pre)],['مالیات عملکرد',(t:any)=>nf(t.s.m.taxc)],
+ ['سود خالص',(t:any)=>nf(t.s.m.net)],['نسبت B÷حکمی',(t:any)=>t.s.m.hk>0?(p.B/t.s.m.hk).toFixed(3):'-'],['نسبت B/C',(t:any)=>(p.B/t.s.m.C).toFixed(3)],
+ ['اختلاف با حکمی فعلی',(t:any)=>nf(t.s.m.hk-cur)],['وضعیت',(t:any)=>t.cur?'وضع فعلی':t.s.ok?'قابل دستیابی ✔':'غیرقابل دستیابی']];
+ $('ceo').innerHTML=(CL as any[]).map((l:any)=>`<tr><th>${l[0]}</th>${T.map(t=>`<td class="n ${t.cur?'hl':''}">${l[1](t)}</td>`).join('')}</tr>`).join('');
+ window._s1=s1;qa('.seg').forEach(x=>x._s&&x._s());save();
 }
 const KEYS=['ename','eid','method','manual','mmode','hrate','hours','contract','role','exp','netexp','ins','days','married','kids','supp','bonus','cloth','food','lodge','transp','over','target','risk','delay'];
-function save(){try{const o={};KEYS.forEach(k=>o[k]=$(k).value);localStorage.setItem('msecnt2',JSON.stringify(o))}catch(e){}}
+function save(){try{const o:any={};KEYS.forEach(k=>o[k]=$(k).value);localStorage.setItem('msecnt2',JSON.stringify(o))}catch(e){}}
 function load(){try{const o=JSON.parse(localStorage.getItem('msecnt2')||'null');if(o)KEYS.forEach(k=>{if(o[k]!=null)$(k).value=o[k]})}catch(e){}}
-function fmtMoney(e){const v=num(e.id);e.value=v?Math.round(v).toLocaleString('en-US'):(e.value===''?'':'0')}
-function segs(){document.querySelectorAll('.seg').forEach(sg=>{const sel=$(sg.dataset.for);const L=sg.dataset.l?sg.dataset.l.split('|'):[...sel.options].map(o=>o.text);const V=sg.dataset.v?sg.dataset.v.split('|'):[...sel.options].map(o=>o.value||o.text);
- sg.innerHTML=V.map((v,i)=>`<button data-v="${v}">${L[i]}</button>`).join('');
- sg.onclick=e=>{const b=e.target.closest('button');if(b){sel.value=b.dataset.v;calc()}};sg._s=()=>sg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===sel.value))})}
-function sync(){document.querySelectorAll('.seg').forEach(s=>s._s&&s._s());document.querySelectorAll('.money').forEach(fmtMoneyIfBlur)}
-function fmtMoneyIfBlur(e){if(document.activeElement!==e)fmtMoney(e)}
-function tab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===id));scrollTo(0,0)}
-document.querySelectorAll('input:not([readonly]),select').forEach(e=>{e.addEventListener('input',()=>{calc();sync()});e.addEventListener('change',()=>{calc();sync()})});
-document.querySelectorAll('.money').forEach(e=>{e.addEventListener('focus',()=>{const v=num(e.id);e.value=v||'';setTimeout(()=>e.select&&e.select(),0)});e.addEventListener('blur',()=>fmtMoney(e))});
-document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const e=$(b.dataset.st);e.value=Math.max(0,num(b.dataset.st)+ +b.dataset.d);calc();sync()});
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>b.dataset.tab==='t5'?openAdmin():tab(b.dataset.tab));
+function fmtMoney(e:any){const v=num(e.id);e.value=v?Math.round(v).toLocaleString('en-US'):(e.value===''?'':'0')}
+function segs(){qa('.seg').forEach(sg=>{const sel=$(sg.dataset.for);const L=sg.dataset.l?sg.dataset.l.split('|'):[...sel.options].map(o=>o.text);const V=sg.dataset.v?sg.dataset.v.split('|'):[...sel.options].map(o=>o.value||o.text);
+ sg.innerHTML=V.map((v:any,i:any)=>`<button data-v="${v}">${L[i]}</button>`).join('');
+ sg.onclick=(e:any)=>{const b=e.target.closest('button');if(b){sel.value=b.dataset.v;calc()}};sg._s=()=>sg.querySelectorAll('button').forEach((b:any)=>b.classList.toggle('on',b.dataset.v===sel.value))})}
+function sync(){qa('.seg').forEach(s=>s._s&&s._s());qa('.money').forEach(fmtMoneyIfBlur)}
+function fmtMoneyIfBlur(e:any){if(document.activeElement!==e)fmtMoney(e)}
+function tab(id:any){qa('.tab').forEach(t=>t.classList.toggle('on',t.id===id));qa('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===id));scrollTo(0,0)}
+qa('input:not([readonly]),select').forEach(e=>{e.addEventListener('input',()=>{calc();sync()});e.addEventListener('change',()=>{calc();sync()})});
+qa('.money').forEach(e=>{e.addEventListener('focus',()=>{const v=num(e.id);e.value=v||'';setTimeout(()=>e.select&&e.select(),0)});e.addEventListener('blur',()=>fmtMoney(e))});
+qa('[data-st]').forEach(b=>b.onclick=()=>{const e=$(b.dataset.st);e.value=Math.max(0,num(b.dataset.st)+ +b.dataset.d);calc();sync()});
+qa('nav button').forEach(b=>b.onclick=()=>b.dataset.tab==='t5'?openAdmin():tab(b.dataset.tab));
 let adminOK=false;
-async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function sha(t:any){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function openAdmin(){
  if(!adminOK){const p=prompt('رمز مدیر را وارد کنید');if(p===null)return;
   try{adminOK=(await sha(p))===ADMIN_HASH}catch(e){alert('این بخش فقط روی https یا localhost کار می‌کند');return}
@@ -140,8 +142,8 @@ async function openAdmin(){
  renderAdmin();tab('t5')}
 function renderAdmin(){
  $('adm').innerHTML='<table class="ceo"><tr><th>ردیف</th><th>شماره قرارداد</th><th>کارفرما</th><th>موضوع قرارداد</th><th>ضریب</th><th></th></tr>'+CON.map((c,i)=>`<tr><td>${i+1}</td><td><input data-i="${i}" data-k="0" value="${c[0]}"></td><td><input data-i="${i}" data-k="1" value="${c[1]}"></td><td><input data-i="${i}" data-k="2" value="${c[2]}"></td><td><input data-i="${i}" data-k="3" value="${c[3]}"></td><td><button data-del="${i}">حذف</button></td></tr>`).join('')+'</table>'}
-$('adm').oninput=e=>{const i=+e.target.dataset.i,k=+e.target.dataset.k;if(isNaN(i)||!CON[i])return;CON[i][k]=k===3?(parseFloat(String(e.target.value).replace(',','.'))||0):e.target.value};
-$('adm').onclick=e=>{const d=e.target.dataset.del;if(d!=null){CON.splice(+d,1);renderAdmin()}};
+$('adm').oninput=(e:any)=>{const i=+e.target.dataset.i,k=+e.target.dataset.k;if(isNaN(i)||!CON[i])return;CON[i][k]=k===3?(parseFloat(String(e.target.value).replace(',','.'))||0):e.target.value};
+$('adm').onclick=(e:any)=>{const d=e.target.dataset.del;if(d!=null){CON.splice(+d,1);renderAdmin()}};
 $('addc').onclick=()=>{CON.push(['','','',0]);renderAdmin()};
 $('savec').onclick=()=>{try{localStorage.setItem('msecnt_con',JSON.stringify(CON));const v=$('contract').value;fillStatic();$('contract').value=v;calc();$('admst').textContent='ذخیره شد ('+CON.length+' قرارداد) در این مرورگر.'}catch(e){$('admst').textContent='ذخیره نشد.'}};
 $('expc').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(CON,null,1)],{type:'application/json'}));a.download='contracts.json';a.click()};
@@ -151,7 +153,7 @@ $('setmax').onclick=()=>{$('netexp').value=Math.floor(window._s1.m.empNet);calc(
 $('pr').onclick=()=>{calc();const h='<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>گزارش</title><style>body{font-family:Tahoma,sans-serif;margin:12px;font-size:13px}table{width:100%;border-collapse:collapse}td{border:1px solid #ccc;padding:5px}td.n{direction:ltr;text-align:left}tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}tr.g td{background:#E2EFDA}tr.y td{background:#FFD966}.ph{margin-bottom:10px}.no{display:none}@media print{.no{display:none}}button{padding:10px;margin-bottom:8px}</style><body><button class="no" style="display:block" onclick="print()">چاپ / ذخیره PDF</button><div class="ph">'+$('ph').innerHTML+'<br>نرخ حق‌الزحمه ساعتی: <b>'+nf(Math.round(window._hr.rate))+' تومان</b> &nbsp; ساعات کار در ماه: <b>'+nf(window._hr.hours)+'</b> &nbsp; <span>('+window._hr.src+')</span>'+'</div><table>'+$('res').innerHTML+'</table></body></html>';
  try{const w=window.open('','_blank');if(w){w.document.open();w.document.write(h);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},400);return}}catch(e){}
  try{window.print()}catch(e){alert('چاپ پشتیبانی نمی‌شود؛ از منوی مرورگر «Share/Print» استفاده کنید.')}};
-$('dm').onclick=()=>{document.body.classList.toggle('dark');try{localStorage.setItem('msecnt_dark',document.body.classList.contains('dark')?1:0)}catch(e){}};
-try{if(localStorage.getItem('msecnt_dark')==1)document.body.classList.add('dark')}catch(e){}
+$('dm').onclick=()=>{document.body.classList.toggle('dark');try{localStorage.setItem('msecnt_dark',document.body.classList.contains('dark')?'1':'0')}catch(e){}};
+try{if(localStorage.getItem('msecnt_dark')=='1')document.body.classList.add('dark')}catch(e){}
 fillStatic();setDefaults();load();segs();calc();sync();
 
