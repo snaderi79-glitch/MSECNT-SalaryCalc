@@ -103,7 +103,7 @@ tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}t
 <div class="card"><h2>سهم اجزا از دریافتی (B)</h2><div class="pie"><svg viewBox="0 0 42 42" id="svg"></svg><div class="lg" id="lg"></div></div></div>
 <div class="card"><h2>نتایج محاسبات</h2><div class="scroll"><table id="res"></table></div></div>
 </div>
-<div class="tab" id="t4"><div class="card"><h2>محاسبه حقوق (خالص) بر اساس سود هدف</h2><div class="g"><div><label>نرخ سود خالص هدف (درصد، عدد صحیح)</label><input id="tgin" inputmode="numeric" value="5"></div></div><div class="scroll"><table id="tg"></table></div>
+<div class="tab" id="t4"><div class="card"><h2>محاسبه حقوق (خالص) بر اساس سود هدف</h2><div class="g"><div><label>نرخ سود خالص هدف (درصد، عدد صحیح)</label><input id="tgin" inputmode="numeric" value="5"></div></div><div class="scroll"><table id="tg"></table></div><h2>سود هدف خالص با حفظ حقوق خالص کارمند</h2><p class="muted">حقوق خالص کارمند (A) ثابت فرض می‌شود و B (دریافتی از کارفرما) به‌صورت خودکار محاسبه می‌شود به‌طوری‌که سود خالص برابر X٪ از B باشد.</p><div class="g"><div><label>نرخ سود خالص هدف X (درصد)</label><input id="bxin" inputmode="numeric" value="5"></div></div><div class="scroll"><table id="bxo"></table></div>
 <div class="btns"><button class="btn" id="setmax">اعمال به‌عنوان حقوق (خالص) مورد انتظار</button></div></div></div>
 <div class="tab" id="t3"><div class="card"><h2>مقایسه سود هدف (۰ تا ۳۰٪)</h2><div class="scroll"><table id="ceo" class="ceo"></table></div>
 <p class="note">سود خالص پیشنهادی برای شرکت‌های گروه فولاد مبارکه ۱۰٪ و برای شرکت‌های خارج از گروه تا ۳۰٪ است. نرخ مالیات عملکرد ۲۵٪، سقف ماده ۳۸ برابر ۱۶٫۶۷٪ و مبالغ بن/مسکن/حق اولاد/تاهل مطابق فایل اکسل ثابت‌اند.</p></div></div>
@@ -198,7 +198,7 @@ tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}t
     const ins = k.emp * ib + w;
     const C = ins + k.eid + base / 12 * k.f + hk / 12 * k.f + k.other + hk;
     const over = p.over * p.B, risk = k.riskT * p.B, ceil = 0.1667 * p.B;
-    const short = Math.max(0, ceil - 0.3 * ib), pre = p.B - C - over - short - risk, taxc = Math.max(0, 0.25 * pre);
+    const short = Math.max(0, ceil - (k.emp + k.wk) * ib), pre = p.B - C - over - short - risk, taxc = Math.max(0, 0.25 * pre);
     return { hk, ib, w, t, ins, C, over, risk, short, pre, taxc, net: pre - taxc, empNet: hk - w - t, ceil };
   }
   function baseFromNet(p, k, net) {
@@ -314,11 +314,40 @@ tr.sh td{background:#2E75B6;color:#fff;font-weight:700}tr.b td{font-weight:700}t
       ["وضعیت", (t) => t.cur ? "وضع فعلی" : t.s.ok ? "قابل دستیابی ✔" : "غیرقابل دستیابی"]
     ];
     $("ceo").innerHTML = CL.map((l) => `<tr><th>${l[0]}</th>${T.map((t) => `<td class="n ${t.cur ? "hl" : ""}">${l[1](t)}</td>`).join("")}</tr>`).join("");
+    {
+      const X = num("bxin") / 100, Bc = p.B;
+      const fn = (b) => {
+        const q2 = { ...p, B: b };
+        return model(q2, k, p.base).net - X * b;
+      };
+      let lo = 0, hi = 1e11;
+      for (let i = 0; i < 100; i++) {
+        const mid = (lo + hi) / 2;
+        if (fn(mid) < 0) lo = mid;
+        else hi = mid;
+      }
+      const Bn = (lo + hi) / 2, q = { ...p, B: Bn }, mn = model(q, k, p.base), ok = fn(hi) > 0 && Bn > 0;
+      const inc = Bc > 0 ? (Bn - Bc) / Bc : 0;
+      const rows = [
+        ["سود خالص هدف (X٪ از B جدید)", pf(X)],
+        ["حقوق (خالص) کارمند (A) — ثابت", nf(mn.empNet)],
+        ["حقوق پایه (ناخالص) — ثابت", nf(p.base)],
+        ["B فعلی (دریافتی از کارفرما)", nf(Bc)],
+        ["B محاسبه‌شده برای سود هدف", ok ? nf(Bn) : "-"],
+        ["افزایش B (ریال)", ok ? nf(Bn - Bc) : "-"],
+        ["درصد افزایش (یا کاهش منفی) B نسبت به B فعلی", ok ? pf(inc) : "-"],
+        ["هزینه کل شرکت (C)", ok ? nf(mn.C) : "-"],
+        ["سود خالص حاصل", ok ? nf(mn.net) : "-"],
+        ["سود خالص ÷ B جدید (بررسی)", ok ? pf(mn.net / Bn) : "-"],
+        ["وضعیت", ok ? "قابل دستیابی ✔" : "غیرقابل دستیابی"]
+      ];
+      $("bxo").innerHTML = rows.map((r) => row(r[0], r[1], r[0].startsWith("درصد") ? "b" : "")).join("");
+    }
     window._s1 = s1;
     qa(".seg").forEach((x) => x._s && x._s());
     save();
   }
-  var KEYS = ["ename", "eid", "method", "manual", "mmode", "hrate", "hours", "contract", "role", "exp", "netexp", "ins", "days", "married", "kids", "supp", "bonus", "cloth", "food", "lodge", "transp", "over", "target", "risk", "delay"];
+  var KEYS = ["bxin", "ename", "eid", "method", "manual", "mmode", "hrate", "hours", "contract", "role", "exp", "netexp", "ins", "days", "married", "kids", "supp", "bonus", "cloth", "food", "lodge", "transp", "over", "target", "risk", "delay"];
   function save() {
     try {
       const o = {};
